@@ -6,6 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -153,7 +154,9 @@
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
       <button class="text-[10px] uppercase tracking-widest text-outline font-extrabold">View All</button>
     </div>
-    <div id="shot-history" class="space-y-3"></div>
+    <div id="shot-history" class="space-y-3">
+      <p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Loading...</p>
+    </div>
   </section>
 
   <div class="pb-10 pt-4">
@@ -181,12 +184,18 @@
 </nav>
 
 <script>
+  // --- Supabase setup ---
+  const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // --- Timer state ---
   let timerInterval = null;
   let timerRunning = false;
   let elapsedMs = 0;
   let startTime = null;
   let selectedRating = null;
-  let shotHistory = JSON.parse(localStorage.getItem('ritual_shots') || '[]');
 
   function toggleTimer() {
     timerRunning ? stopTimer() : startTimer();
@@ -250,34 +259,58 @@
     selectedRating = btn.textContent.trim();
   }
 
-  function saveShot() {
+  // --- Save shot to Supabase ---
+  async function saveShot() {
     const seconds = Math.round(elapsedMs / 1000);
     if (seconds === 0) { showToast('Run a shot first!'); return; }
+
     const shot = {
-      id: Date.now(),
-      time: seconds,
+      bean_name: 'Ethiopia Yirgacheffe',
+      duration: seconds,
       rating: selectedRating || 'Unrated',
-      notes: document.getElementById('shot-notes').value,
-      bean: 'Ethiopia Yirgacheffe',
-      date: new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
+      notes: document.getElementById('shot-notes').value || null,
     };
-    shotHistory.unshift(shot);
-    localStorage.setItem('ritual_shots', JSON.stringify(shotHistory));
-    renderHistory();
+
+    const { error } = await db.from('shots').insert(shot);
+
+    if (error) {
+      showToast('Error saving — check connection');
+      console.error(error);
+      return;
+    }
+
+    showToast('Shot saved ✓');
     resetTimer();
     selectedRating = null;
     document.getElementById('shot-notes').value = '';
-    document.querySelectorAll('.rating-btn').forEach(b => { b.style.backgroundColor = ''; b.style.color = '#F1DFD3'; });
-    showToast('Shot saved ✓');
+    document.querySelectorAll('.rating-btn').forEach(b => {
+      b.style.backgroundColor = '';
+      b.style.color = '#F1DFD3';
+    });
+    loadHistory();
   }
 
-  function renderHistory() {
+  // --- Load shots from Supabase ---
+  async function loadHistory() {
     const container = document.getElementById('shot-history');
-    const recent = shotHistory.slice(0, 5);
-    if (recent.length === 0) {
+
+    const { data: shots, error } = await db
+      .from('shots')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    if (error) {
+      container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Could not load history</p>';
+      console.error(error);
+      return;
+    }
+
+    if (!shots || shots.length === 0) {
       container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">No shots logged yet</p>';
       return;
     }
+
     const colors = {
       'Balanced': 'color:#F1DFD3;background:rgba(241,223,211,0.1)',
       'Sour': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
@@ -286,34 +319,41 @@
       'Over-extracted': 'color:#9c8d8a;background:#2a2a2a',
       'Unrated': 'color:#9c8d8a;background:#2a2a2a',
     };
-    container.innerHTML = recent.map(shot => `
-      <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
-        <div class="flex items-center gap-4">
-          <div class="text-center min-w-[36px]">
-            <span class="block text-sm font-extrabold text-primary">${shot.time}s</span>
-            <span class="block text-[8px] uppercase font-bold text-outline">time</span>
+
+    container.innerHTML = shots.map(shot => {
+      const date = new Date(shot.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+      const ratingStyle = colors[shot.rating] || colors['Unrated'];
+      const notePreview = shot.notes ? ' • ' + shot.notes.substring(0, 30) + (shot.notes.length > 30 ? '…' : '') : '';
+      return `
+        <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
+          <div class="flex items-center gap-4">
+            <div class="text-center min-w-[36px]">
+              <span class="block text-sm font-extrabold text-primary">${shot.duration}s</span>
+              <span class="block text-[8px] uppercase font-bold text-outline">time</span>
+            </div>
+            <div class="h-6 w-px bg-outline-variant/20"></div>
+            <div class="space-y-0.5">
+              <span class="block text-sm font-bold text-on-surface">${shot.bean_name || '—'}</span>
+              <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${date}${notePreview}</span>
+            </div>
           </div>
-          <div class="h-6 w-px bg-outline-variant/20"></div>
-          <div class="space-y-0.5">
-            <span class="block text-sm font-bold text-on-surface">${shot.bean}</span>
-            <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${shot.date}${shot.notes ? ' • ' + shot.notes.substring(0,30) + (shot.notes.length>30?'…':'') : ''}</span>
-          </div>
+          <span style="${ratingStyle}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest">${shot.rating}</span>
         </div>
-        <span style="${colors[shot.rating]||colors['Unrated']}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest">${shot.rating}</span>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function showToast(message) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
-    toast.classList.remove('hidden','toast-anim');
+    toast.classList.remove('hidden', 'toast-anim');
     void toast.offsetWidth;
     toast.classList.add('toast-anim');
     setTimeout(() => toast.classList.add('hidden'), 2700);
   }
 
-  renderHistory();
+  // Load history on page open
+  loadHistory();
 </script>
 </body>
 </html>
