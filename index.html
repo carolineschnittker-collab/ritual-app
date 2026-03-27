@@ -1,249 +1,319 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
+<html class="dark" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "surface-container-high": "#2a2a2a",
-              "on-error-container": "#ffdad6",
-              "surface": "#131313",
-              "primary-container": "#49362f",
-              "error": "#ffb4ab",
-              "on-secondary": "#422a26",
-              "primary": "#F1DFD3", // Soft vanilla tone
-              "tertiary-container": "#403936",
-              "primary-fixed": "#F1DFD3",
-              "on-primary": "#3e2c26",
-              "secondary": "#F0BD8B", // Warm vanilla/tan tone
-              "primary-fixed-dim": "#F1DFD3",
-              "on-error": "#690005",
-              "on-tertiary-fixed": "#201a18",
-              "secondary-fixed": "#ffdad4",
-              "inverse-surface": "#e5e2e1",
-              "outline-variant": "#504442",
-              "surface-variant": "#353534",
-              "surface-dim": "#131313",
-              "background": "#131313",
-              "on-tertiary-container": "#aca29f",
-              "surface-container": "#201f1f",
-              "surface-tint": "#F1DFD3",
-              "outline": "#9c8d8a",
-              "on-surface": "#e5e2e1",
-              "on-tertiary-fixed-variant": "#4c4542",
-              "secondary-container": "#5b403c",
-              "on-background": "#e5e2e1",
-              "on-secondary-container": "#d1ada7",
-              "inverse-on-surface": "#313030",
-              "on-secondary-fixed": "#2b1613",
-              "on-primary-container": "#3e2c26",
-              "inverse-primary": "#6f5a52",
-              "on-surface-variant": "#d4c3bf",
-              "surface-container-lowest": "#0e0e0e",
-              "on-primary-fixed": "#271812",
-              "on-primary-fixed-variant": "#56423b",
-              "surface-container-highest": "#353534",
-              "on-secondary-fixed-variant": "#5b403c",
-              "tertiary-fixed": "#ece0dc",
-              "surface-container-low": "#1c1b1b",
-              "tertiary": "#cfc4c0",
-              "error-container": "#93000a",
-              "surface-bright": "#393939",
-              "secondary-fixed-dim": "#e3beb8",
-              "tertiary-fixed-dim": "#cfc4c0",
-              "on-tertiary": "#352f2d"
-            },
-            fontFamily: {
-              "headline": ["Manrope"],
-              "body": ["Manrope"],
-              "label": ["Manrope"]
-            },
-            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1.5rem", "full": "9999px"},
-          },
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container-high": "#2a2a2a",
+          "surface": "#131313",
+          "primary-container": "#49362f",
+          "on-secondary": "#422a26",
+          "primary": "#F1DFD3",
+          "on-primary": "#3e2c26",
+          "secondary": "#F0BD8B",
+          "outline-variant": "#504442",
+          "surface-variant": "#353534",
+          "background": "#131313",
+          "surface-container": "#201f1f",
+          "outline": "#9c8d8a",
+          "on-surface": "#e5e2e1",
+          "secondary-container": "#5b403c",
+          "on-background": "#e5e2e1",
+          "inverse-surface": "#e5e2e1",
+          "on-secondary-container": "#d1ada7",
+          "inverse-on-surface": "#313030",
+          "on-primary-container": "#3e2c26",
+          "on-surface-variant": "#d4c3bf",
+          "surface-container-lowest": "#0e0e0e",
+          "surface-container-highest": "#353534",
+          "surface-container-low": "#1c1b1b",
+          "tertiary": "#cfc4c0",
+          "error": "#ffb4ab",
+          "surface-bright": "#393939",
+          "on-tertiary": "#352f2d"
         },
-      }
-    </script>
+        fontFamily: { "headline": ["Manrope"], "body": ["Manrope"], "label": ["Manrope"] },
+        borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1.5rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
 <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        body {
-            background-color: #131313;
-            color: #E5E2E1;
-            font-family: 'Manrope', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-        .dial-ring {
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
-        }
-    </style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { background-color: #131313; color: #E5E2E1; font-family: 'Manrope', sans-serif; -webkit-font-smoothing: antialiased; }
+  .dial-ring { box-shadow: inset 0 0 20px rgba(0,0,0,0.4); }
+  @keyframes pulse-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .timer-running { animation: pulse-glow 1.2s ease-in-out infinite; color: #F1DFD3; }
+  @keyframes slide-up-fade { 0% { opacity:0; transform:translateY(8px);} 15% { opacity:1; transform:translateY(0);} 80% { opacity:1; } 100% { opacity:0; transform:translateY(-4px);} }
+  .toast-anim { animation: slide-up-fade 2.6s ease forwards; }
+</style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-48">
-<!-- Top App Bar -->
-<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md"><div class="flex items-center justify-between w-full">
-<button class="p-2 hover:bg-white/5 rounded-full transition-colors">
-<span class="material-symbols-outlined text-primary text-2xl">menu</span>
-</button>
-<h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
-<button class="p-2 hover:bg-white/5 rounded-full transition-colors">
-<span class="material-symbols-outlined text-primary text-2xl">settings</span>
-</button>
-</div></header>
+
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
+  <div class="flex items-center justify-between w-full">
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-primary text-2xl">menu</span>
+    </button>
+    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors">
+      <span class="material-symbols-outlined text-primary text-2xl">settings</span>
+    </button>
+  </div>
+</header>
+
 <main class="px-6 max-w-2xl mx-auto space-y-12 pt-24">
-<!-- Grind Setting Dial Section -->
-<section class="flex flex-col items-center">
-<!-- Circular Dial from SCREEN_12 -->
-<div class="relative w-64 h-64 flex items-center justify-center">
-<!-- Outer Ring -->
-<div class="absolute inset-0 rounded-full border-[10px] border-surface-container-low dial-ring"></div>
-<!-- Center Reading -->
-<div class="text-center z-10 bg-surface-container rounded-full w-48 h-48 flex flex-col items-center justify-center shadow-2xl border border-outline-variant/10">
-<span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Current Dial</span>
-<span class="text-7xl font-extrabold tracking-tighter text-on-surface">18.5</span>
-<span class="text-outline font-bold text-[10px] mt-2 tracking-widest uppercase">Stepless</span>
-</div>
-<!-- Dial Marker -->
-<div class="absolute top-2 w-1 h-4 bg-primary rounded-full"></div>
-</div>
-<!-- Last Extraction underneath dial -->
-<div class="mt-6 flex flex-col items-center gap-1">
-<div class="flex items-center gap-2 opacity-60">
-<span class="material-symbols-outlined text-sm">history</span>
-<p class="text-[10px] uppercase tracking-widest font-bold">last extraction</p>
-</div>
-<div class="flex items-baseline gap-1">
-<span class="text-4xl font-extrabold text-primary">28</span>
-<span class="text-xl font-bold text-primary opacity-60">s</span>
-</div>
-</div>
-<!-- Dedicated Shot Timer Area -->
-<div class="w-full mt-10 bg-surface-container-low rounded-xl p-6 flex flex-col items-center shadow-lg border border-outline-variant/10">
-<span class="text-5xl font-mono font-bold tracking-tight text-on-surface mb-6">00:00.0</span>
-<div class="flex gap-4 w-full max-w-[280px]">
-<button class="flex-1 bg-surface-container-high text-on-surface px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all active:scale-95">Reset</button>
-<button class="flex-1 bg-primary text-on-primary px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-lg transition-all active:scale-95">Start</button>
-</div>
-</div>
-</section>
-<!-- Currently Brewing Card -->
-<section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
-<div class="flex justify-between items-start z-10">
-<div class="space-y-1">
-<p class="text-[10px] uppercase tracking-widest text-primary font-bold">Currently Brewing</p>
-<h3 class="text-2xl font-extrabold text-on-surface tracking-tight">Ethiopia Yirgacheffe</h3>
-<p class="text-sm text-outline-variant font-medium italic">Washed process • Light roast</p>
-</div>
-<button class="w-10 h-10 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
-<span class="material-symbols-outlined text-primary text-lg">edit</span>
-</button>
-</div>
-<!-- Inventory Indicator from SCREEN_19 -->
-<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-end">
-<div class="space-y-1">
-<p class="text-[10px] text-outline font-bold uppercase tracking-widest">inventory status</p>
-<p class="text-xl font-extrabold text-on-surface">12 <span class="text-xs font-medium text-outline">shots left</span></p>
-</div>
-<div class="w-32 h-2 bg-surface-container rounded-full overflow-hidden">
-<div class="bg-primary h-full w-[40%] rounded-full"></div>
-</div>
-</div>
-</section>
-<!-- Rate Last Shot & Notes -->
-<section class="space-y-8">
-<div class="space-y-4">
-<p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Rate Last Shot</p>
-<div class="flex flex-wrap gap-2">
-<button class="px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary hover:bg-primary hover:text-on-primary transition-all">Bitter</button>
-<button class="px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary hover:bg-primary hover:text-on-primary transition-all">Sour</button>
-<button class="px-5 py-2.5 bg-primary text-on-primary rounded-full text-[10px] uppercase tracking-widest font-extrabold">Balanced</button>
-<button class="px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary hover:bg-primary hover:text-on-primary transition-all">Under-extracted</button>
-</div>
-</div>
-<div class="space-y-4">
-<p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">General Notes</p>
-<textarea class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl p-5 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 h-32 resize-none" placeholder="Describe the mouthfeel or floral notes..."></textarea>
-</div>
-</section>
-<!-- Recent Shot History -->
-<section class="space-y-6">
-<div class="flex justify-between items-end border-b border-outline-variant/10 pb-4">
-<p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
-<button class="text-[10px] uppercase tracking-widest text-outline font-extrabold">View All</button>
-</div>
-<div class="space-y-3">
-<!-- Log Items from SCREEN_12/26 format -->
-<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors border border-outline-variant/5">
-<div class="flex items-center gap-4">
-<div class="text-center min-w-[36px]">
-<span class="block text-sm font-extrabold text-primary">28s</span>
-<span class="block text-[8px] uppercase font-bold text-outline">time</span>
-</div>
-<div class="h-6 w-px bg-outline-variant/20"></div>
-<div class="space-y-0.5">
-<span class="block text-sm font-bold text-on-surface">18g In / 36g Out</span>
-<span class="block text-[9px] font-bold uppercase tracking-wider text-outline">Oct 12 • Colombia Huila</span>
-</div>
-</div>
-<span class="px-3 py-1 bg-primary/10 text-primary text-[9px] font-extrabold rounded uppercase tracking-widest">Balanced</span>
-</div>
-<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors border border-outline-variant/5">
-<div class="flex items-center gap-4">
-<div class="text-center min-w-[36px]">
-<span class="block text-sm font-extrabold text-primary">27s</span>
-<span class="block text-[8px] uppercase font-bold text-outline">time</span>
-</div>
-<div class="h-6 w-px bg-outline-variant/20"></div>
-<div class="space-y-0.5">
-<span class="block text-sm font-bold text-on-surface">18g In / 38g Out</span>
-<span class="block text-[9px] font-bold uppercase tracking-wider text-outline">Oct 11 • Ethiopia Sidamo</span>
-</div>
-</div>
-<span class="px-3 py-1 bg-secondary/10 text-secondary text-[9px] font-extrabold rounded uppercase tracking-widest">Sour</span>
-</div>
-<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors border border-outline-variant/5">
-<div class="flex items-center gap-4">
-<div class="text-center min-w-[36px]">
-<span class="block text-sm font-extrabold text-primary">31s</span>
-<span class="block text-[8px] uppercase font-bold text-outline">time</span>
-</div>
-<div class="h-6 w-px bg-outline-variant/20"></div>
-<div class="space-y-0.5">
-<span class="block text-sm font-bold text-on-surface">18g In / 34g Out</span>
-<span class="block text-[9px] font-bold uppercase tracking-wider text-outline">Oct 10 • Kenya AA</span>
-</div>
-</div>
-<span class="px-3 py-1 bg-surface-container-high text-outline text-[9px] font-extrabold rounded uppercase tracking-widest">Bitter</span>
-</div>
-</div>
-</section>
-<!-- Footer Add New Bean Button -->
-<div class="pb-10 pt-4">
-<button class="w-full bg-primary text-on-primary py-4 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all active:scale-[0.98]">
-<span class="material-symbols-outlined font-bold">add_circle</span>
-<span class="font-extrabold text-sm uppercase tracking-[0.15em]">Add New Bean</span>
-</button>
-</div>
+
+  <section class="flex flex-col items-center">
+    <div class="relative w-64 h-64 flex items-center justify-center">
+      <div class="absolute inset-0 rounded-full border-[10px] border-surface-container-low dial-ring"></div>
+      <div class="text-center z-10 bg-surface-container rounded-full w-48 h-48 flex flex-col items-center justify-center shadow-2xl border border-outline-variant/10">
+        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Current Dial</span>
+        <span class="text-7xl font-extrabold tracking-tighter text-on-surface">18.5</span>
+        <span class="text-outline font-bold text-[10px] mt-2 tracking-widest uppercase">Stepless</span>
+      </div>
+      <div class="absolute top-2 w-1 h-4 bg-primary rounded-full"></div>
+    </div>
+
+    <div class="mt-6 flex flex-col items-center gap-1">
+      <div class="flex items-center gap-2 opacity-60">
+        <span class="material-symbols-outlined text-sm">history</span>
+        <p class="text-[10px] uppercase tracking-widest font-bold">last extraction</p>
+      </div>
+      <div class="flex items-baseline gap-1">
+        <span id="last-extraction-time" class="text-4xl font-extrabold text-primary">--</span>
+        <span id="last-extraction-unit" class="text-xl font-bold text-primary opacity-60"></span>
+      </div>
+    </div>
+
+    <div class="w-full mt-10 bg-surface-container-low rounded-xl p-6 flex flex-col items-center shadow-lg border border-outline-variant/10">
+      <span id="timer-display" class="text-5xl font-mono font-bold tracking-tight text-on-surface mb-6">00:00.0</span>
+      <div class="flex gap-4 w-full max-w-[280px]">
+        <button id="reset-btn" onclick="resetTimer()" class="flex-1 bg-surface-container-high text-on-surface px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all active:scale-95">Reset</button>
+        <button id="start-stop-btn" onclick="toggleTimer()" class="flex-1 bg-primary text-on-primary px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-lg transition-all active:scale-95">Start</button>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden mt-4 px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center"></div>
+  </section>
+
+  <section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
+    <div class="flex justify-between items-start">
+      <div class="space-y-1">
+        <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Currently Brewing</p>
+        <h3 class="text-2xl font-extrabold text-on-surface tracking-tight">Ethiopia Yirgacheffe</h3>
+        <p class="text-sm text-outline-variant font-medium italic">Washed process • Light roast</p>
+      </div>
+      <button class="w-10 h-10 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
+        <span class="material-symbols-outlined text-primary text-lg">edit</span>
+      </button>
+    </div>
+    <div class="pt-4 border-t border-outline-variant/10 flex justify-between items-end">
+      <div class="space-y-1">
+        <p class="text-[10px] text-outline font-bold uppercase tracking-widest">inventory status</p>
+        <p class="text-xl font-extrabold text-on-surface">12 <span class="text-xs font-medium text-outline">shots left</span></p>
+      </div>
+      <div class="w-32 h-2 bg-surface-container rounded-full overflow-hidden">
+        <div class="bg-primary h-full w-[40%] rounded-full"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-8">
+    <div class="space-y-4">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Rate Last Shot</p>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Bitter</button>
+        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Sour</button>
+        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Balanced</button>
+        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Under-extracted</button>
+        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Over-extracted</button>
+      </div>
+    </div>
+    <div class="space-y-4">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">General Notes</p>
+      <textarea id="shot-notes" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl p-5 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 h-32 resize-none" placeholder="Describe the mouthfeel or floral notes..."></textarea>
+    </div>
+    <button onclick="saveShot()" class="w-full border border-primary/30 text-primary py-3 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">
+      <span class="material-symbols-outlined text-sm">save</span>
+      Save Shot
+    </button>
+  </section>
+
+  <section class="space-y-6">
+    <div class="flex justify-between items-end border-b border-outline-variant/10 pb-4">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
+      <button class="text-[10px] uppercase tracking-widest text-outline font-extrabold">View All</button>
+    </div>
+    <div id="shot-history" class="space-y-3"></div>
+  </section>
+
+  <div class="pb-10 pt-4">
+    <button class="w-full bg-primary text-on-primary py-4 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all active:scale-[0.98]">
+      <span class="material-symbols-outlined font-bold">add_circle</span>
+      <span class="font-extrabold text-sm uppercase tracking-[0.15em]">Add New Bean</span>
+    </button>
+  </div>
+
 </main>
-<!-- Bottom Navigation Bar -->
+
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-<a class="flex flex-col items-center justify-center text-on-primary bg-primary rounded-xl px-6 py-2.5 transition-transform active:scale-95" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
-<span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">tracker</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface opacity-40 px-6 py-2.5 hover:opacity-100 transition-all active:scale-95" href="#">
-<span class="material-symbols-outlined">menu_book</span>
-<span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">journal</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-surface opacity-40 px-6 py-2.5 hover:opacity-100 transition-all active:scale-95" href="#">
-<span class="material-symbols-outlined">coffee_maker</span>
-<span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">brew</span>
-</a>
+  <a class="flex flex-col items-center justify-center text-on-primary bg-primary rounded-xl px-6 py-2.5 transition-transform active:scale-95" href="#">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
+    <span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">tracker</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface opacity-40 px-6 py-2.5 hover:opacity-100 transition-all active:scale-95" href="#">
+    <span class="material-symbols-outlined">menu_book</span>
+    <span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">journal</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface opacity-40 px-6 py-2.5 hover:opacity-100 transition-all active:scale-95" href="#">
+    <span class="material-symbols-outlined">coffee_maker</span>
+    <span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">brew</span>
+  </a>
 </nav>
-</body></html>
+
+<script>
+  let timerInterval = null;
+  let timerRunning = false;
+  let elapsedMs = 0;
+  let startTime = null;
+  let selectedRating = null;
+  let shotHistory = JSON.parse(localStorage.getItem('ritual_shots') || '[]');
+
+  function toggleTimer() {
+    timerRunning ? stopTimer() : startTimer();
+  }
+
+  function startTimer() {
+    timerRunning = true;
+    startTime = Date.now() - elapsedMs;
+    timerInterval = setInterval(updateDisplay, 100);
+    const btn = document.getElementById('start-stop-btn');
+    btn.textContent = 'Stop';
+    btn.style.backgroundColor = '#ffb4ab';
+    btn.style.color = '#690005';
+    document.getElementById('timer-display').classList.add('timer-running');
+  }
+
+  function stopTimer() {
+    timerRunning = false;
+    clearInterval(timerInterval);
+    const btn = document.getElementById('start-stop-btn');
+    btn.textContent = 'Start';
+    btn.style.backgroundColor = '';
+    btn.style.color = '';
+    document.getElementById('timer-display').classList.remove('timer-running');
+    const seconds = Math.round(elapsedMs / 1000);
+    document.getElementById('last-extraction-time').textContent = seconds;
+    document.getElementById('last-extraction-unit').textContent = 's';
+    showToast('Shot stopped at ' + seconds + 's — rate & save below');
+  }
+
+  function resetTimer() {
+    timerRunning = false;
+    clearInterval(timerInterval);
+    elapsedMs = 0;
+    document.getElementById('timer-display').textContent = '00:00.0';
+    document.getElementById('timer-display').classList.remove('timer-running');
+    const btn = document.getElementById('start-stop-btn');
+    btn.textContent = 'Start';
+    btn.style.backgroundColor = '';
+    btn.style.color = '';
+  }
+
+  function updateDisplay() {
+    elapsedMs = Date.now() - startTime;
+    const totalTenths = Math.floor(elapsedMs / 100);
+    const tenths = totalTenths % 10;
+    const totalSeconds = Math.floor(totalTenths / 10);
+    const seconds = totalSeconds % 60;
+    const minutes = Math.floor(totalSeconds / 60);
+    document.getElementById('timer-display').textContent =
+      String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0') + '.' + tenths;
+  }
+
+  function selectRating(btn) {
+    document.querySelectorAll('.rating-btn').forEach(b => {
+      b.style.backgroundColor = '';
+      b.style.color = '#F1DFD3';
+    });
+    btn.style.backgroundColor = '#F1DFD3';
+    btn.style.color = '#3e2c26';
+    selectedRating = btn.textContent.trim();
+  }
+
+  function saveShot() {
+    const seconds = Math.round(elapsedMs / 1000);
+    if (seconds === 0) { showToast('Run a shot first!'); return; }
+    const shot = {
+      id: Date.now(),
+      time: seconds,
+      rating: selectedRating || 'Unrated',
+      notes: document.getElementById('shot-notes').value,
+      bean: 'Ethiopia Yirgacheffe',
+      date: new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
+    };
+    shotHistory.unshift(shot);
+    localStorage.setItem('ritual_shots', JSON.stringify(shotHistory));
+    renderHistory();
+    resetTimer();
+    selectedRating = null;
+    document.getElementById('shot-notes').value = '';
+    document.querySelectorAll('.rating-btn').forEach(b => { b.style.backgroundColor = ''; b.style.color = '#F1DFD3'; });
+    showToast('Shot saved ✓');
+  }
+
+  function renderHistory() {
+    const container = document.getElementById('shot-history');
+    const recent = shotHistory.slice(0, 5);
+    if (recent.length === 0) {
+      container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">No shots logged yet</p>';
+      return;
+    }
+    const colors = {
+      'Balanced': 'color:#F1DFD3;background:rgba(241,223,211,0.1)',
+      'Sour': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
+      'Bitter': 'color:#9c8d8a;background:#2a2a2a',
+      'Under-extracted': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
+      'Over-extracted': 'color:#9c8d8a;background:#2a2a2a',
+      'Unrated': 'color:#9c8d8a;background:#2a2a2a',
+    };
+    container.innerHTML = recent.map(shot => `
+      <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
+        <div class="flex items-center gap-4">
+          <div class="text-center min-w-[36px]">
+            <span class="block text-sm font-extrabold text-primary">${shot.time}s</span>
+            <span class="block text-[8px] uppercase font-bold text-outline">time</span>
+          </div>
+          <div class="h-6 w-px bg-outline-variant/20"></div>
+          <div class="space-y-0.5">
+            <span class="block text-sm font-bold text-on-surface">${shot.bean}</span>
+            <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${shot.date}${shot.notes ? ' • ' + shot.notes.substring(0,30) + (shot.notes.length>30?'…':'') : ''}</span>
+          </div>
+        </div>
+        <span style="${colors[shot.rating]||colors['Unrated']}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest">${shot.rating}</span>
+      </div>
+    `).join('');
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden','toast-anim');
+    void toast.offsetWidth;
+    toast.classList.add('toast-anim');
+    setTimeout(() => toast.classList.add('hidden'), 2700);
+  }
+
+  renderHistory();
+</script>
+</body>
+</html>
