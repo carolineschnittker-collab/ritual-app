@@ -55,9 +55,29 @@
   .timer-running { animation: pulse-glow 1.2s ease-in-out infinite; color: #F1DFD3; }
   @keyframes slide-up-fade { 0% { opacity:0; transform:translateY(8px);} 15% { opacity:1; transform:translateY(0);} 80% { opacity:1; } 100% { opacity:0; transform:translateY(-4px);} }
   .toast-anim { animation: slide-up-fade 2.6s ease forwards; }
+  .dial-container { cursor: grab; user-select: none; touch-action: none; }
+  .dial-container:active { cursor: grabbing; }
+  #grind-input { background: transparent; border: none; outline: none; text-align: center; width: 100%; color: #e5e2e1; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 4.5rem; line-height: 1; letter-spacing: -0.02em; }
+  #grind-input::-webkit-inner-spin-button, #grind-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+  .modal-sheet { background: #1c1b1b; border-radius: 1.5rem 1.5rem 0 0; padding: 2rem; width: 100%; max-width: 480px; border: 1px solid rgba(80,68,66,0.3); }
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-48">
+
+<!-- Brewer modal -->
+<div id="brewer-modal" class="modal-overlay hidden">
+  <div class="modal-sheet space-y-6">
+    <div class="text-center">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Who's pulling this shot?</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="confirmSaveShot('Steph')" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Steph</button>
+      <button onclick="confirmSaveShot('Ross')" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Ross</button>
+    </div>
+    <button onclick="closeBrewerModal()" class="w-full text-outline text-[10px] uppercase tracking-widest font-bold py-2">Cancel</button>
+  </div>
+</div>
 
 <header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
   <div class="flex items-center justify-between w-full">
@@ -73,17 +93,26 @@
 
 <main class="px-6 max-w-2xl mx-auto space-y-12 pt-24">
 
+  <!-- Dial -->
   <section class="flex flex-col items-center">
-    <div class="relative w-64 h-64 flex items-center justify-center">
+    <div id="dial-container" class="dial-container relative w-64 h-64 flex items-center justify-center">
       <div class="absolute inset-0 rounded-full border-[10px] border-surface-container-low dial-ring"></div>
+      <svg class="absolute inset-0 w-full h-full" viewBox="0 0 256 256">
+        <g id="tick-marks"></g>
+      </svg>
       <div class="text-center z-10 bg-surface-container rounded-full w-48 h-48 flex flex-col items-center justify-center shadow-2xl border border-outline-variant/10">
-        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Current Dial</span>
-        <span class="text-7xl font-extrabold tracking-tighter text-on-surface">18.5</span>
+        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Grind Setting</span>
+        <input id="grind-input" type="number" min="1" max="30" step="0.5" value="18.5"
+          onclick="focusGrindInput()"
+          onblur="blurGrindInput()"
+          oninput="onGrindInputChange()" />
         <span class="text-outline font-bold text-[10px] mt-2 tracking-widest uppercase">Stepless</span>
       </div>
-      <div class="absolute top-2 w-1 h-4 bg-primary rounded-full"></div>
+      <div id="dial-marker" class="absolute w-1.5 h-5 bg-primary rounded-full" style="top:8px;left:50%;transform:translateX(-50%);"></div>
     </div>
+    <p class="text-[10px] uppercase tracking-widest text-outline font-bold mt-3 opacity-60">Drag to adjust • Tap number to type</p>
 
+    <!-- Last extraction -->
     <div class="mt-6 flex flex-col items-center gap-1">
       <div class="flex items-center gap-2 opacity-60">
         <span class="material-symbols-outlined text-sm">history</span>
@@ -93,8 +122,10 @@
         <span id="last-extraction-time" class="text-4xl font-extrabold text-primary">--</span>
         <span id="last-extraction-unit" class="text-xl font-bold text-primary opacity-60"></span>
       </div>
+      <span id="last-extraction-brewer" class="text-[10px] uppercase tracking-widest text-outline font-bold opacity-60"></span>
     </div>
 
+    <!-- Timer -->
     <div class="w-full mt-10 bg-surface-container-low rounded-xl p-6 flex flex-col items-center shadow-lg border border-outline-variant/10">
       <span id="timer-display" class="text-5xl font-mono font-bold tracking-tight text-on-surface mb-6">00:00.0</span>
       <div class="flex gap-4 w-full max-w-[280px]">
@@ -106,6 +137,7 @@
     <div id="toast" class="hidden mt-4 px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center"></div>
   </section>
 
+  <!-- Currently Brewing -->
   <section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
     <div class="flex justify-between items-start">
       <div class="space-y-1">
@@ -128,6 +160,7 @@
     </div>
   </section>
 
+  <!-- Rate & Notes -->
   <section class="space-y-8">
     <div class="space-y-4">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Rate Last Shot</p>
@@ -149,6 +182,7 @@
     </button>
   </section>
 
+  <!-- Shot History -->
   <section class="space-y-6">
     <div class="flex justify-between items-end border-b border-outline-variant/10 pb-4">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
@@ -165,7 +199,6 @@
       <span class="font-extrabold text-sm uppercase tracking-[0.15em]">Add New Bean</span>
     </button>
   </div>
-
 </main>
 
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
@@ -184,22 +217,20 @@
 </nav>
 
 <script>
-  // --- Supabase setup ---
+  // ── Supabase ──────────────────────────────────────────────
   const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // --- Timer state ---
+  // ── Timer ─────────────────────────────────────────────────
   let timerInterval = null;
   let timerRunning = false;
   let elapsedMs = 0;
   let startTime = null;
   let selectedRating = null;
+  let pendingDuration = 0;
 
-  function toggleTimer() {
-    timerRunning ? stopTimer() : startTimer();
-  }
+  function toggleTimer() { timerRunning ? stopTimer() : startTimer(); }
 
   function startTimer() {
     timerRunning = true;
@@ -220,16 +251,15 @@
     btn.style.backgroundColor = '';
     btn.style.color = '';
     document.getElementById('timer-display').classList.remove('timer-running');
-    const seconds = Math.round(elapsedMs / 1000);
-    document.getElementById('last-extraction-time').textContent = seconds;
-    document.getElementById('last-extraction-unit').textContent = 's';
-    showToast('Shot stopped at ' + seconds + 's — rate & save below');
+    pendingDuration = Math.round(elapsedMs / 1000);
+    showToast('Shot stopped at ' + pendingDuration + 's — rate & save below');
   }
 
   function resetTimer() {
     timerRunning = false;
     clearInterval(timerInterval);
     elapsedMs = 0;
+    pendingDuration = 0;
     document.getElementById('timer-display').textContent = '00:00.0';
     document.getElementById('timer-display').classList.remove('timer-running');
     const btn = document.getElementById('start-stop-btn');
@@ -259,26 +289,40 @@
     selectedRating = btn.textContent.trim();
   }
 
-  // --- Save shot to Supabase ---
-  async function saveShot() {
-    const seconds = Math.round(elapsedMs / 1000);
+  // ── Save shot ─────────────────────────────────────────────
+  function saveShot() {
+    const seconds = pendingDuration || Math.round(elapsedMs / 1000);
     if (seconds === 0) { showToast('Run a shot first!'); return; }
+    document.getElementById('brewer-modal').classList.remove('hidden');
+  }
+
+  function closeBrewerModal() {
+    document.getElementById('brewer-modal').classList.add('hidden');
+  }
+
+  async function confirmSaveShot(brewer) {
+    closeBrewerModal();
+    const seconds = pendingDuration || Math.round(elapsedMs / 1000);
+    const grind = parseFloat(document.getElementById('grind-input').value) || grindSetting;
 
     const shot = {
       bean_name: 'Ethiopia Yirgacheffe',
+      grind_setting: grind,
       duration: seconds,
       rating: selectedRating || 'Unrated',
       notes: document.getElementById('shot-notes').value || null,
+      brewer: brewer,
     };
 
-    const { error } = await db.from('shots').insert(shot);
+    const { data, error } = await db.from('shots').insert([shot]).select();
 
     if (error) {
-      showToast('Error saving — check connection');
-      console.error(error);
+      console.error('Supabase insert error:', error);
+      showToast('Error saving — try again');
       return;
     }
 
+    updateLastExtractionDisplay(seconds, brewer);
     showToast('Shot saved ✓');
     resetTimer();
     selectedRating = null;
@@ -290,10 +334,27 @@
     loadHistory();
   }
 
-  // --- Load shots from Supabase ---
+  // ── Last extraction ───────────────────────────────────────
+  function updateLastExtractionDisplay(seconds, brewer) {
+    document.getElementById('last-extraction-time').textContent = seconds;
+    document.getElementById('last-extraction-unit').textContent = 's';
+    document.getElementById('last-extraction-brewer').textContent = brewer ? 'by ' + brewer : '';
+  }
+
+  async function loadLastExtraction() {
+    const { data, error } = await db
+      .from('shots')
+      .select('duration, brewer')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (!error && data && data.length > 0) {
+      updateLastExtractionDisplay(data[0].duration, data[0].brewer);
+    }
+  }
+
+  // ── Shot history ──────────────────────────────────────────
   async function loadHistory() {
     const container = document.getElementById('shot-history');
-
     const { data: shots, error } = await db
       .from('shots')
       .select('*')
@@ -301,8 +362,8 @@
       .limit(5);
 
     if (error) {
+      console.error('Supabase load error:', error);
       container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Could not load history</p>';
-      console.error(error);
       return;
     }
 
@@ -312,18 +373,19 @@
     }
 
     const colors = {
-      'Balanced': 'color:#F1DFD3;background:rgba(241,223,211,0.1)',
-      'Sour': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
-      'Bitter': 'color:#9c8d8a;background:#2a2a2a',
+      'Balanced':        'color:#F1DFD3;background:rgba(241,223,211,0.1)',
+      'Sour':            'color:#F0BD8B;background:rgba(240,189,139,0.1)',
+      'Bitter':          'color:#9c8d8a;background:#2a2a2a',
       'Under-extracted': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
-      'Over-extracted': 'color:#9c8d8a;background:#2a2a2a',
-      'Unrated': 'color:#9c8d8a;background:#2a2a2a',
+      'Over-extracted':  'color:#9c8d8a;background:#2a2a2a',
+      'Unrated':         'color:#9c8d8a;background:#2a2a2a',
     };
 
     container.innerHTML = shots.map(shot => {
       const date = new Date(shot.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
       const ratingStyle = colors[shot.rating] || colors['Unrated'];
-      const notePreview = shot.notes ? ' • ' + shot.notes.substring(0, 30) + (shot.notes.length > 30 ? '…' : '') : '';
+      const notePreview = shot.notes ? ' • ' + shot.notes.substring(0, 28) + (shot.notes.length > 28 ? '…' : '') : '';
+      const brewerTag = shot.brewer ? `<span class="ml-1 px-2 py-0.5 bg-surface-container-high text-outline text-[8px] font-extrabold rounded uppercase tracking-widest">${shot.brewer}</span>` : '';
       return `
         <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
           <div class="flex items-center gap-4">
@@ -333,16 +395,133 @@
             </div>
             <div class="h-6 w-px bg-outline-variant/20"></div>
             <div class="space-y-0.5">
-              <span class="block text-sm font-bold text-on-surface">${shot.bean_name || '—'}</span>
+              <div class="flex items-center gap-1 flex-wrap">
+                <span class="text-sm font-bold text-on-surface">${shot.bean_name || '—'}</span>
+                ${brewerTag}
+              </div>
               <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${date}${notePreview}</span>
             </div>
           </div>
-          <span style="${ratingStyle}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest">${shot.rating}</span>
+          <span style="${ratingStyle}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest flex-shrink-0">${shot.rating}</span>
         </div>
       `;
     }).join('');
   }
 
+  // ── Dial ──────────────────────────────────────────────────
+  let grindSetting = 18.5;
+  let isDragging = false;
+  let lastAngle = 0;
+  const MIN_GRIND = 1;
+  const MAX_GRIND = 30;
+  const DEGREES_PER_UNIT = 300 / (MAX_GRIND - MIN_GRIND);
+
+  function grindToAngle(g) {
+    return (g - MIN_GRIND) * DEGREES_PER_UNIT - 150;
+  }
+
+  function getPointerAngle(e, rect) {
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return Math.atan2(clientY - cy, clientX - cx) * 180 / Math.PI + 90;
+  }
+
+  function updateDial(newGrind) {
+    newGrind = Math.max(MIN_GRIND, Math.min(MAX_GRIND, Math.round(newGrind * 2) / 2));
+    grindSetting = newGrind;
+    document.getElementById('grind-input').value = newGrind;
+    const angle = grindToAngle(newGrind);
+    const marker = document.getElementById('dial-marker');
+    const r = 112;
+    const rad = (angle - 90) * Math.PI / 180;
+    const px = 50 + (r / 128) * 50 * Math.cos(rad);
+    const py = 50 + (r / 128) * 50 * Math.sin(rad);
+    marker.style.left = px + '%';
+    marker.style.top = py + '%';
+    marker.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+    drawTicks();
+    localStorage.setItem('ritual_grind', newGrind);
+  }
+
+  function drawTicks() {
+    const g = document.getElementById('tick-marks');
+    g.innerHTML = '';
+    const cx = 128, cy = 128, r = 118;
+    for (let i = 0; i <= (MAX_GRIND - MIN_GRIND) * 2; i++) {
+      const grind = MIN_GRIND + i * 0.5;
+      const angle = grindToAngle(grind);
+      const rad = (angle - 90) * Math.PI / 180;
+      const isMajor = Number.isInteger(grind);
+      const len = isMajor ? 10 : 5;
+      const x1 = cx + (r - len) * Math.cos(rad);
+      const y1 = cy + (r - len) * Math.sin(rad);
+      const x2 = cx + r * Math.cos(rad);
+      const y2 = cy + r * Math.sin(rad);
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke', grind <= grindSetting ? '#F1DFD3' : '#504442');
+      line.setAttribute('stroke-width', isMajor ? 2 : 1);
+      line.setAttribute('stroke-linecap', 'round');
+      g.appendChild(line);
+    }
+  }
+
+  const dialEl = document.getElementById('dial-container');
+
+  dialEl.addEventListener('mousedown', e => {
+    if (e.target.id === 'grind-input') return;
+    isDragging = true;
+    lastAngle = getPointerAngle(e, dialEl.getBoundingClientRect());
+  });
+
+  dialEl.addEventListener('touchstart', e => {
+    if (e.target.id === 'grind-input') return;
+    isDragging = true;
+    lastAngle = getPointerAngle(e, dialEl.getBoundingClientRect());
+  }, { passive: true });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const angle = getPointerAngle(e, dialEl.getBoundingClientRect());
+    let delta = angle - lastAngle;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    lastAngle = angle;
+    updateDial(grindSetting + delta / DEGREES_PER_UNIT);
+  });
+
+  window.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const angle = getPointerAngle(e, dialEl.getBoundingClientRect());
+    let delta = angle - lastAngle;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    lastAngle = angle;
+    updateDial(grindSetting + delta / DEGREES_PER_UNIT);
+  }, { passive: true });
+
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  window.addEventListener('touchend', () => { isDragging = false; });
+
+  function focusGrindInput() {
+    document.getElementById('grind-input').select();
+  }
+
+  function blurGrindInput() {
+    let val = parseFloat(document.getElementById('grind-input').value);
+    if (isNaN(val)) val = grindSetting;
+    updateDial(val);
+  }
+
+  function onGrindInputChange() {
+    let val = parseFloat(document.getElementById('grind-input').value);
+    if (!isNaN(val)) updateDial(val);
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
   function showToast(message) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
@@ -352,7 +531,10 @@
     setTimeout(() => toast.classList.add('hidden'), 2700);
   }
 
-  // Load history on page open
+  // ── Init ──────────────────────────────────────────────────
+  const savedGrind = parseFloat(localStorage.getItem('ritual_grind')) || 18.5;
+  updateDial(savedGrind);
+  loadLastExtraction();
   loadHistory();
 </script>
 </body>
