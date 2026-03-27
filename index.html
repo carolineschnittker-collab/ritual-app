@@ -13,33 +13,15 @@
     theme: {
       extend: {
         colors: {
-          "surface-container-high": "#2a2a2a",
-          "surface": "#131313",
-          "primary-container": "#49362f",
-          "on-secondary": "#422a26",
-          "primary": "#F1DFD3",
-          "on-primary": "#3e2c26",
-          "secondary": "#F0BD8B",
-          "outline-variant": "#504442",
-          "surface-variant": "#353534",
-          "background": "#131313",
-          "surface-container": "#201f1f",
-          "outline": "#9c8d8a",
-          "on-surface": "#e5e2e1",
-          "secondary-container": "#5b403c",
-          "on-background": "#e5e2e1",
-          "inverse-surface": "#e5e2e1",
-          "on-secondary-container": "#d1ada7",
-          "inverse-on-surface": "#313030",
-          "on-primary-container": "#3e2c26",
-          "on-surface-variant": "#d4c3bf",
-          "surface-container-lowest": "#0e0e0e",
-          "surface-container-highest": "#353534",
-          "surface-container-low": "#1c1b1b",
-          "tertiary": "#cfc4c0",
-          "error": "#ffb4ab",
-          "surface-bright": "#393939",
-          "on-tertiary": "#352f2d"
+          "surface-container-high": "#2a2a2a","surface": "#131313","primary-container": "#49362f",
+          "on-secondary": "#422a26","primary": "#F1DFD3","on-primary": "#3e2c26","secondary": "#F0BD8B",
+          "outline-variant": "#504442","surface-variant": "#353534","background": "#131313",
+          "surface-container": "#201f1f","outline": "#9c8d8a","on-surface": "#e5e2e1",
+          "secondary-container": "#5b403c","on-background": "#e5e2e1","inverse-surface": "#e5e2e1",
+          "on-secondary-container": "#d1ada7","inverse-on-surface": "#313030","on-primary-container": "#3e2c26",
+          "on-surface-variant": "#d4c3bf","surface-container-lowest": "#0e0e0e",
+          "surface-container-highest": "#353534","surface-container-low": "#1c1b1b",
+          "tertiary": "#cfc4c0","error": "#ffb4ab","surface-bright": "#393939","on-tertiary": "#352f2d"
         },
         fontFamily: { "headline": ["Manrope"], "body": ["Manrope"], "label": ["Manrope"] },
         borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1.5rem", "full": "9999px"},
@@ -53,66 +35,69 @@
   .dial-ring { box-shadow: inset 0 0 20px rgba(0,0,0,0.4); }
   @keyframes pulse-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   .timer-running { animation: pulse-glow 1.2s ease-in-out infinite; color: #F1DFD3; }
-  @keyframes slide-up-fade { 0% { opacity:0; transform:translateY(8px);} 15% { opacity:1; transform:translateY(0);} 80% { opacity:1; } 100% { opacity:0; transform:translateY(-4px);} }
+  @keyframes slide-up-fade { 0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);} }
   .toast-anim { animation: slide-up-fade 2.6s ease forwards; }
   .dial-container { cursor: grab; user-select: none; touch-action: none; }
   .dial-container:active { cursor: grabbing; }
-  #grind-input { background: transparent; border: none; outline: none; text-align: center; width: 100%; color: #e5e2e1; font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 4.5rem; line-height: 1; letter-spacing: -0.02em; }
-  #grind-input::-webkit-inner-spin-button, #grind-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
-  .modal-sheet { background: #1c1b1b; border-radius: 1.5rem 1.5rem 0 0; padding: 2rem; width: 100%; max-width: 480px; border: 1px solid rgba(80,68,66,0.3); }
+  #grind-input { background:transparent;border:none;outline:none;text-align:center;width:100%;color:#e5e2e1;font-family:'Manrope',sans-serif;font-weight:800;font-size:4.5rem;line-height:1;letter-spacing:-0.02em; }
+  #grind-input::-webkit-inner-spin-button,#grind-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+  .modal-sheet{background:#1c1b1b;border-radius:1.5rem 1.5rem 0 0;padding:2rem;width:100%;max-width:480px;border:1px solid rgba(80,68,66,0.3);}
+  .shot-row-wrapper{position:relative;overflow:hidden;border-radius:0.75rem;margin-bottom:0.75rem;}
+  .shot-row-delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:#93000a;display:flex;align-items:center;justify-content:center;border-radius:0 0.75rem 0.75rem 0;}
+  .shot-row-delete-bg span{color:#ffdad6;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+  .shot-row{position:relative;touch-action:pan-y;background:#1c1b1b;border-radius:0.75rem;transition:transform 0.15s ease;}
+  .shot-row.swiping{transition:none;}
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-48">
 
-<!-- Brewer modal -->
 <div id="brewer-modal" class="modal-overlay hidden">
   <div class="modal-sheet space-y-6">
-    <div class="text-center">
-      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Who's pulling this shot?</p>
-    </div>
+    <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold text-center">Who's pulling this shot?</p>
     <div class="flex gap-3">
-      <button onclick="confirmSaveShot('Steph')" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Steph</button>
+      <button onclick="confirmSaveShot('Caro')" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Caro</button>
       <button onclick="confirmSaveShot('Ross')" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Ross</button>
     </div>
     <button onclick="closeBrewerModal()" class="w-full text-outline text-[10px] uppercase tracking-widest font-bold py-2">Cancel</button>
   </div>
 </div>
 
+<div id="confirm-modal" class="modal-overlay hidden">
+  <div class="modal-sheet space-y-6 text-center">
+    <div class="space-y-2">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-error font-bold">Delete Shot?</p>
+      <p class="text-sm text-outline font-medium">This can't be undone.</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="closeConfirmModal()" class="flex-1 bg-surface-container-high text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Cancel</button>
+      <button onclick="executeDelete()" class="flex-1 py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95" style="background:#93000a;color:#ffdad6;">Delete</button>
+    </div>
+  </div>
+</div>
+
 <header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
   <div class="flex items-center justify-between w-full">
-    <button class="p-2 hover:bg-white/5 rounded-full transition-colors">
-      <span class="material-symbols-outlined text-primary text-2xl">menu</span>
-    </button>
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">menu</span></button>
     <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
-    <button class="p-2 hover:bg-white/5 rounded-full transition-colors">
-      <span class="material-symbols-outlined text-primary text-2xl">settings</span>
-    </button>
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">settings</span></button>
   </div>
 </header>
 
 <main class="px-6 max-w-2xl mx-auto space-y-12 pt-24">
 
-  <!-- Dial -->
   <section class="flex flex-col items-center">
     <div id="dial-container" class="dial-container relative w-64 h-64 flex items-center justify-center">
       <div class="absolute inset-0 rounded-full border-[10px] border-surface-container-low dial-ring"></div>
-      <svg class="absolute inset-0 w-full h-full" viewBox="0 0 256 256">
-        <g id="tick-marks"></g>
-      </svg>
+      <svg class="absolute inset-0 w-full h-full" viewBox="0 0 256 256"><g id="tick-marks"></g></svg>
       <div class="text-center z-10 bg-surface-container rounded-full w-48 h-48 flex flex-col items-center justify-center shadow-2xl border border-outline-variant/10">
-        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Grind Setting</span>
+        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-3">Grind Setting</span>
         <input id="grind-input" type="number" min="1" max="30" step="0.5" value="18.5"
-          onclick="focusGrindInput()"
-          onblur="blurGrindInput()"
-          oninput="onGrindInputChange()" />
-        <span class="text-outline font-bold text-[10px] mt-2 tracking-widest uppercase">Stepless</span>
+          onclick="focusGrindInput()" onblur="blurGrindInput()" oninput="onGrindInputChange()"/>
       </div>
       <div id="dial-marker" class="absolute w-1.5 h-5 bg-primary rounded-full" style="top:8px;left:50%;transform:translateX(-50%);"></div>
     </div>
-    <p class="text-[10px] uppercase tracking-widest text-outline font-bold mt-3 opacity-60">Drag to adjust • Tap number to type</p>
 
-    <!-- Last extraction -->
     <div class="mt-6 flex flex-col items-center gap-1">
       <div class="flex items-center gap-2 opacity-60">
         <span class="material-symbols-outlined text-sm">history</span>
@@ -125,19 +110,16 @@
       <span id="last-extraction-brewer" class="text-[10px] uppercase tracking-widest text-outline font-bold opacity-60"></span>
     </div>
 
-    <!-- Timer -->
     <div class="w-full mt-10 bg-surface-container-low rounded-xl p-6 flex flex-col items-center shadow-lg border border-outline-variant/10">
       <span id="timer-display" class="text-5xl font-mono font-bold tracking-tight text-on-surface mb-6">00:00.0</span>
       <div class="flex gap-4 w-full max-w-[280px]">
-        <button id="reset-btn" onclick="resetTimer()" class="flex-1 bg-surface-container-high text-on-surface px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all active:scale-95">Reset</button>
+        <button onclick="resetTimer()" class="flex-1 bg-surface-container-high text-on-surface px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all active:scale-95">Reset</button>
         <button id="start-stop-btn" onclick="toggleTimer()" class="flex-1 bg-primary text-on-primary px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest shadow-lg transition-all active:scale-95">Start</button>
       </div>
     </div>
-
     <div id="toast" class="hidden mt-4 px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center"></div>
   </section>
 
-  <!-- Currently Brewing -->
   <section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
     <div class="flex justify-between items-start">
       <div class="space-y-1">
@@ -160,35 +142,40 @@
     </div>
   </section>
 
-  <!-- Rate & Notes -->
-  <section class="space-y-8">
-    <div class="space-y-4">
+  <section class="space-y-6">
+    <div class="space-y-3">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Rate Last Shot</p>
       <div class="flex flex-wrap gap-2">
-        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Bitter</button>
-        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Sour</button>
-        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Balanced</button>
-        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Under-extracted</button>
-        <button onclick="selectRating(this)" class="rating-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Over-extracted</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Bitter</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Sour</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Balanced</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Under-extracted</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Over-extracted</button>
       </div>
     </div>
-    <div class="space-y-4">
-      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">General Notes</p>
-      <textarea id="shot-notes" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl p-5 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 h-32 resize-none" placeholder="Describe the mouthfeel or floral notes..."></textarea>
+    <div class="space-y-3">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Grind Speed</p>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Fast</button>
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Normal</button>
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Slow</button>
+      </div>
     </div>
-    <button onclick="saveShot()" class="w-full border border-primary/30 text-primary py-3 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">
-      <span class="material-symbols-outlined text-sm">save</span>
+    <div class="space-y-3">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">General Notes</p>
+      <textarea id="shot-notes" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 h-20 resize-none" placeholder="Mouthfeel, floral notes..."></textarea>
+    </div>
+    <button onclick="saveShot()" class="w-full border border-primary/30 text-primary py-3 rounded-xl transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">
       Save Shot
     </button>
   </section>
 
-  <!-- Shot History -->
   <section class="space-y-6">
     <div class="flex justify-between items-end border-b border-outline-variant/10 pb-4">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
       <button class="text-[10px] uppercase tracking-widest text-outline font-extrabold">View All</button>
     </div>
-    <div id="shot-history" class="space-y-3">
+    <div id="shot-history" class="space-y-0">
       <p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Loading...</p>
     </div>
   </section>
@@ -203,7 +190,7 @@
 
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
   <a class="flex flex-col items-center justify-center text-on-primary bg-primary rounded-xl px-6 py-2.5 transition-transform active:scale-95" href="#">
-    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">timer</span>
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">timer</span>
     <span class="text-[10px] uppercase tracking-widest font-extrabold mt-1">tracker</span>
   </a>
   <a class="flex flex-col items-center justify-center text-on-surface opacity-40 px-6 py-2.5 hover:opacity-100 transition-all active:scale-95" href="#">
@@ -217,323 +204,261 @@
 </nav>
 
 <script>
-  // ── Supabase ──────────────────────────────────────────────
   const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ── Timer ─────────────────────────────────────────────────
-  let timerInterval = null;
-  let timerRunning = false;
-  let elapsedMs = 0;
-  let startTime = null;
-  let selectedRating = null;
-  let pendingDuration = 0;
+  let timerInterval=null, timerRunning=false, elapsedMs=0, startTime=null, pendingDuration=0;
 
-  function toggleTimer() { timerRunning ? stopTimer() : startTimer(); }
+  function toggleTimer(){ timerRunning ? stopTimer() : startTimer(); }
 
-  function startTimer() {
-    timerRunning = true;
-    startTime = Date.now() - elapsedMs;
-    timerInterval = setInterval(updateDisplay, 100);
-    const btn = document.getElementById('start-stop-btn');
-    btn.textContent = 'Stop';
-    btn.style.backgroundColor = '#ffb4ab';
-    btn.style.color = '#690005';
+  function startTimer(){
+    timerRunning=true; startTime=Date.now()-elapsedMs;
+    timerInterval=setInterval(updateDisplay,100);
+    const btn=document.getElementById('start-stop-btn');
+    btn.textContent='Stop'; btn.style.backgroundColor='#ffb4ab'; btn.style.color='#690005';
     document.getElementById('timer-display').classList.add('timer-running');
   }
 
-  function stopTimer() {
-    timerRunning = false;
-    clearInterval(timerInterval);
-    const btn = document.getElementById('start-stop-btn');
-    btn.textContent = 'Start';
-    btn.style.backgroundColor = '';
-    btn.style.color = '';
+  function stopTimer(){
+    timerRunning=false; clearInterval(timerInterval);
+    const btn=document.getElementById('start-stop-btn');
+    btn.textContent='Start'; btn.style.backgroundColor=''; btn.style.color='';
     document.getElementById('timer-display').classList.remove('timer-running');
-    pendingDuration = Math.round(elapsedMs / 1000);
-    showToast('Shot stopped at ' + pendingDuration + 's — rate & save below');
+    pendingDuration=Math.round(elapsedMs/1000);
+    showToast('Shot stopped at '+pendingDuration+'s — rate & save below');
   }
 
-  function resetTimer() {
-    timerRunning = false;
-    clearInterval(timerInterval);
-    elapsedMs = 0;
-    pendingDuration = 0;
-    document.getElementById('timer-display').textContent = '00:00.0';
+  function resetTimer(){
+    timerRunning=false; clearInterval(timerInterval); elapsedMs=0; pendingDuration=0;
+    document.getElementById('timer-display').textContent='00:00.0';
     document.getElementById('timer-display').classList.remove('timer-running');
-    const btn = document.getElementById('start-stop-btn');
-    btn.textContent = 'Start';
-    btn.style.backgroundColor = '';
-    btn.style.color = '';
+    const btn=document.getElementById('start-stop-btn');
+    btn.textContent='Start'; btn.style.backgroundColor=''; btn.style.color='';
   }
 
-  function updateDisplay() {
-    elapsedMs = Date.now() - startTime;
-    const totalTenths = Math.floor(elapsedMs / 100);
-    const tenths = totalTenths % 10;
-    const totalSeconds = Math.floor(totalTenths / 10);
-    const seconds = totalSeconds % 60;
-    const minutes = Math.floor(totalSeconds / 60);
-    document.getElementById('timer-display').textContent =
-      String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0') + '.' + tenths;
+  function updateDisplay(){
+    elapsedMs=Date.now()-startTime;
+    const tt=Math.floor(elapsedMs/100), tenths=tt%10, ts=Math.floor(tt/10), s=ts%60, m=Math.floor(ts/60);
+    document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+tenths;
   }
 
-  function selectRating(btn) {
-    document.querySelectorAll('.rating-btn').forEach(b => {
-      b.style.backgroundColor = '';
-      b.style.color = '#F1DFD3';
-    });
-    btn.style.backgroundColor = '#F1DFD3';
-    btn.style.color = '#3e2c26';
-    selectedRating = btn.textContent.trim();
+  // ── Tags ──────────────────────────────────────────────────
+  const multiGroups=['rating'];
+
+  function toggleTag(btn,group){
+    const isMulti=multiGroups.includes(group);
+    const active=btn.style.backgroundColor==='rgb(241, 223, 211)'||btn.style.backgroundColor===' #F1DFD3'||btn.getAttribute('data-active')==='1';
+    if(!isMulti){
+      document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{ b.style.backgroundColor=''; b.style.color='#F1DFD3'; b.removeAttribute('data-active'); });
+      if(!active){ btn.style.backgroundColor='#F1DFD3'; btn.style.color='#3e2c26'; btn.setAttribute('data-active','1'); }
+    } else {
+      if(active){ btn.style.backgroundColor=''; btn.style.color='#F1DFD3'; btn.removeAttribute('data-active'); }
+      else { btn.style.backgroundColor='#F1DFD3'; btn.style.color='#3e2c26'; btn.setAttribute('data-active','1'); }
+    }
   }
 
-  // ── Save shot ─────────────────────────────────────────────
-  function saveShot() {
-    const seconds = pendingDuration || Math.round(elapsedMs / 1000);
-    if (seconds === 0) { showToast('Run a shot first!'); return; }
+  function getSelectedTags(group){
+    const out=[];
+    document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{ if(b.getAttribute('data-active')==='1') out.push(b.textContent.trim()); });
+    return out;
+  }
+
+  function clearTags(group){
+    document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{ b.style.backgroundColor=''; b.style.color='#F1DFD3'; b.removeAttribute('data-active'); });
+  }
+
+  // ── Save ──────────────────────────────────────────────────
+  function saveShot(){
+    const s=pendingDuration||Math.round(elapsedMs/1000);
+    if(s===0){showToast('Run a shot first!');return;}
     document.getElementById('brewer-modal').classList.remove('hidden');
   }
+  function closeBrewerModal(){ document.getElementById('brewer-modal').classList.add('hidden'); }
 
-  function closeBrewerModal() {
-    document.getElementById('brewer-modal').classList.add('hidden');
-  }
-
-  async function confirmSaveShot(brewer) {
+  async function confirmSaveShot(brewer){
     closeBrewerModal();
-    const seconds = pendingDuration || Math.round(elapsedMs / 1000);
-    const grind = parseFloat(document.getElementById('grind-input').value) || grindSetting;
-
-    const shot = {
-      bean_name: 'Ethiopia Yirgacheffe',
-      grind_setting: grind,
-      duration: seconds,
-      rating: selectedRating || 'Unrated',
-      notes: document.getElementById('shot-notes').value || null,
-      brewer: brewer,
-    };
-
-    const { data, error } = await db.from('shots').insert([shot]).select();
-
-    if (error) {
-      console.error('Supabase insert error:', error);
-      showToast('Error saving — try again');
-      return;
-    }
-
-    updateLastExtractionDisplay(seconds, brewer);
+    const seconds=pendingDuration||Math.round(elapsedMs/1000);
+    const grind=parseFloat(document.getElementById('grind-input').value)||grindSetting;
+    const ratings=getSelectedTags('rating');
+    const grindSpeed=getSelectedTags('grind-speed')[0]||null;
+    const shot={ bean_name:'Ethiopia Yirgacheffe', grind_setting:grind, duration:seconds,
+      rating:ratings.length>0?ratings.join(', '):'Unrated',
+      notes:document.getElementById('shot-notes').value||null, brewer, grind_speed:grindSpeed };
+    const {error}=await db.from('shots').insert([shot]).select();
+    if(error){console.error(error);showToast('Error saving — try again');return;}
+    updateLastExtractionDisplay(seconds,brewer);
     showToast('Shot saved ✓');
-    resetTimer();
-    selectedRating = null;
-    document.getElementById('shot-notes').value = '';
-    document.querySelectorAll('.rating-btn').forEach(b => {
-      b.style.backgroundColor = '';
-      b.style.color = '#F1DFD3';
-    });
+    resetTimer(); clearTags('rating'); clearTags('grind-speed');
+    document.getElementById('shot-notes').value='';
     loadHistory();
   }
 
   // ── Last extraction ───────────────────────────────────────
-  function updateLastExtractionDisplay(seconds, brewer) {
-    document.getElementById('last-extraction-time').textContent = seconds;
-    document.getElementById('last-extraction-unit').textContent = 's';
-    document.getElementById('last-extraction-brewer').textContent = brewer ? 'by ' + brewer : '';
+  function updateLastExtractionDisplay(s,brewer){
+    document.getElementById('last-extraction-time').textContent=s;
+    document.getElementById('last-extraction-unit').textContent='s';
+    document.getElementById('last-extraction-brewer').textContent=brewer?'by '+brewer:'';
+  }
+  async function loadLastExtraction(){
+    const{data,error}=await db.from('shots').select('duration,brewer').order('created_at',{ascending:false}).limit(1);
+    if(!error&&data&&data.length>0) updateLastExtractionDisplay(data[0].duration,data[0].brewer);
   }
 
-  async function loadLastExtraction() {
-    const { data, error } = await db
-      .from('shots')
-      .select('duration, brewer')
-      .order('created_at', { ascending: false })
-      .limit(1);
-    if (!error && data && data.length > 0) {
-      updateLastExtractionDisplay(data[0].duration, data[0].brewer);
-    }
+  // ── History ───────────────────────────────────────────────
+  function ratingStyle(r){
+    const m={'Balanced':'color:#F1DFD3;background:rgba(241,223,211,0.1)','Sour':'color:#F0BD8B;background:rgba(240,189,139,0.1)',
+      'Bitter':'color:#9c8d8a;background:#2a2a2a','Under-extracted':'color:#F0BD8B;background:rgba(240,189,139,0.1)',
+      'Over-extracted':'color:#9c8d8a;background:#2a2a2a','Unrated':'color:#9c8d8a;background:#2a2a2a'};
+    if(!r) return m['Unrated'];
+    return m[r.split(',')[0].trim()]||m['Unrated'];
   }
 
-  // ── Shot history ──────────────────────────────────────────
-  async function loadHistory() {
-    const container = document.getElementById('shot-history');
-    const { data: shots, error } = await db
-      .from('shots')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    if (error) {
-      console.error('Supabase load error:', error);
-      container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Could not load history</p>';
-      return;
-    }
-
-    if (!shots || shots.length === 0) {
-      container.innerHTML = '<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">No shots logged yet</p>';
-      return;
-    }
-
-    const colors = {
-      'Balanced':        'color:#F1DFD3;background:rgba(241,223,211,0.1)',
-      'Sour':            'color:#F0BD8B;background:rgba(240,189,139,0.1)',
-      'Bitter':          'color:#9c8d8a;background:#2a2a2a',
-      'Under-extracted': 'color:#F0BD8B;background:rgba(240,189,139,0.1)',
-      'Over-extracted':  'color:#9c8d8a;background:#2a2a2a',
-      'Unrated':         'color:#9c8d8a;background:#2a2a2a',
-    };
-
-    container.innerHTML = shots.map(shot => {
-      const date = new Date(shot.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-      const ratingStyle = colors[shot.rating] || colors['Unrated'];
-      const notePreview = shot.notes ? ' • ' + shot.notes.substring(0, 28) + (shot.notes.length > 28 ? '…' : '') : '';
-      const brewerTag = shot.brewer ? `<span class="ml-1 px-2 py-0.5 bg-surface-container-high text-outline text-[8px] font-extrabold rounded uppercase tracking-widest">${shot.brewer}</span>` : '';
-      return `
-        <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl hover:bg-surface-container-high transition-colors border border-outline-variant/5">
-          <div class="flex items-center gap-4">
-            <div class="text-center min-w-[36px]">
-              <span class="block text-sm font-extrabold text-primary">${shot.duration}s</span>
-              <span class="block text-[8px] uppercase font-bold text-outline">time</span>
-            </div>
-            <div class="h-6 w-px bg-outline-variant/20"></div>
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-1 flex-wrap">
-                <span class="text-sm font-bold text-on-surface">${shot.bean_name || '—'}</span>
-                ${brewerTag}
+  async function loadHistory(){
+    const container=document.getElementById('shot-history');
+    const{data:shots,error}=await db.from('shots').select('*').order('created_at',{ascending:false}).limit(5);
+    if(error){console.error(error);container.innerHTML='<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">Could not load history</p>';return;}
+    if(!shots||shots.length===0){container.innerHTML='<p class="text-outline text-xs text-center py-4 uppercase tracking-widest font-bold">No shots logged yet</p>';return;}
+    container.innerHTML=shots.map(shot=>{
+      const date=new Date(shot.created_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+      const notePreview=shot.notes?shot.notes.substring(0,32)+(shot.notes.length>32?'…':''):'';
+      return `<div class="shot-row-wrapper" id="wrapper-${shot.id}">
+        <div class="shot-row-delete-bg"><span>Delete</span></div>
+        <div class="shot-row border border-outline-variant/5 p-4" id="row-${shot.id}" data-id="${shot.id}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="text-center min-w-[36px]">
+                <span class="block text-sm font-extrabold text-primary">${shot.duration}s</span>
+                <span class="block text-[8px] uppercase font-bold text-outline">time</span>
               </div>
-              <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${date}${notePreview}</span>
+              <div class="h-10 w-px bg-outline-variant/20"></div>
+              <div class="space-y-0.5">
+                <span class="block text-sm font-bold text-on-surface">${shot.bean_name||'—'}</span>
+                <span class="block text-[9px] font-bold uppercase tracking-wider text-outline">${date}</span>
+                ${shot.brewer?`<span class="block text-[9px] font-bold uppercase tracking-wider text-outline opacity-70">${shot.brewer}</span>`:''}
+                ${notePreview?`<span class="block text-[9px] text-outline/60 mt-0.5">${notePreview}</span>`:''}
+              </div>
             </div>
+            <span class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest flex-shrink-0 ml-2" style="${ratingStyle(shot.rating)}">${shot.rating}</span>
           </div>
-          <span style="${ratingStyle}" class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest flex-shrink-0">${shot.rating}</span>
         </div>
-      `;
+      </div>`;
     }).join('');
+    shots.forEach(shot=>attachSwipe(shot.id));
+  }
+
+  // ── Swipe to delete ───────────────────────────────────────
+  const swipeState={};
+  let pendingDeleteId=null;
+
+  function attachSwipe(id){
+    const row=document.getElementById('row-'+id);
+    if(!row) return;
+    row.addEventListener('touchstart',e=>swipeStart(e,id),{passive:true});
+    row.addEventListener('touchmove',e=>swipeMove(e,id),{passive:true});
+    row.addEventListener('touchend',e=>swipeEnd(e,id));
+  }
+
+  function swipeStart(e,id){
+    swipeState[id]={startX:e.touches[0].clientX,currentX:0};
+    document.getElementById('row-'+id).classList.add('swiping');
+  }
+
+  function swipeMove(e,id){
+    const st=swipeState[id]; if(!st) return;
+    const dx=Math.min(0,e.touches[0].clientX-st.startX);
+    st.currentX=dx;
+    const row=document.getElementById('row-'+id);
+    if(row) row.style.transform='translateX('+dx+'px)';
+  }
+
+  function swipeEnd(e,id){
+    const st=swipeState[id]; if(!st) return;
+    const row=document.getElementById('row-'+id);
+    if(row) row.classList.remove('swiping');
+    const dx=Math.abs(st.currentX);
+    delete swipeState[id];
+    if(dx>=160){
+      deleteShot(id);
+    } else if(dx>=60){
+      if(row){ row.style.transition='transform 0.15s ease'; row.style.transform='translateX(-80px)'; }
+      const wrapper=document.getElementById('wrapper-'+id);
+      const bg=wrapper&&wrapper.querySelector('.shot-row-delete-bg');
+      if(bg) bg.onclick=()=>{ pendingDeleteId=id; document.getElementById('confirm-modal').classList.remove('hidden'); };
+    } else {
+      if(row){ row.style.transition='transform 0.2s ease'; row.style.transform='translateX(0)'; setTimeout(()=>{if(row)row.style.transition='';},200); }
+    }
+  }
+
+  function closeConfirmModal(){
+    document.getElementById('confirm-modal').classList.add('hidden');
+    if(pendingDeleteId){
+      const row=document.getElementById('row-'+pendingDeleteId);
+      if(row){row.style.transition='transform 0.2s ease';row.style.transform='translateX(0)';setTimeout(()=>{if(row)row.style.transition='';},200);}
+      pendingDeleteId=null;
+    }
+  }
+  async function executeDelete(){ document.getElementById('confirm-modal').classList.add('hidden'); if(!pendingDeleteId)return; await deleteShot(pendingDeleteId); pendingDeleteId=null; }
+  async function deleteShot(id){
+    const{error}=await db.from('shots').delete().eq('id',id);
+    if(error){console.error(error);showToast('Could not delete — try again');return;}
+    showToast('Shot deleted'); loadHistory(); loadLastExtraction();
   }
 
   // ── Dial ──────────────────────────────────────────────────
-  let grindSetting = 18.5;
-  let isDragging = false;
-  let lastAngle = 0;
-  const MIN_GRIND = 1;
-  const MAX_GRIND = 30;
-  const DEGREES_PER_UNIT = 300 / (MAX_GRIND - MIN_GRIND);
-
-  function grindToAngle(g) {
-    return (g - MIN_GRIND) * DEGREES_PER_UNIT - 150;
+  let grindSetting=18.5, isDragging=false, lastAngle=0;
+  const MIN_GRIND=1, MAX_GRIND=30, DEGREES_PER_UNIT=300/(MAX_GRIND-MIN_GRIND);
+  function grindToAngle(g){return(g-MIN_GRIND)*DEGREES_PER_UNIT-150;}
+  function getPointerAngle(e,rect){
+    const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    const clientX=e.touches?e.touches[0].clientX:e.clientX, clientY=e.touches?e.touches[0].clientY:e.clientY;
+    return Math.atan2(clientY-cy,clientX-cx)*180/Math.PI+90;
   }
-
-  function getPointerAngle(e, rect) {
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return Math.atan2(clientY - cy, clientX - cx) * 180 / Math.PI + 90;
+  function updateDial(g){
+    g=Math.max(MIN_GRIND,Math.min(MAX_GRIND,Math.round(g*2)/2)); grindSetting=g;
+    document.getElementById('grind-input').value=g;
+    const angle=grindToAngle(g), marker=document.getElementById('dial-marker'), r=112;
+    const rad=(angle-90)*Math.PI/180;
+    marker.style.left=(50+(r/128)*50*Math.cos(rad))+'%';
+    marker.style.top=(50+(r/128)*50*Math.sin(rad))+'%';
+    marker.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
+    drawTicks(); localStorage.setItem('ritual_grind',g);
   }
-
-  function updateDial(newGrind) {
-    newGrind = Math.max(MIN_GRIND, Math.min(MAX_GRIND, Math.round(newGrind * 2) / 2));
-    grindSetting = newGrind;
-    document.getElementById('grind-input').value = newGrind;
-    const angle = grindToAngle(newGrind);
-    const marker = document.getElementById('dial-marker');
-    const r = 112;
-    const rad = (angle - 90) * Math.PI / 180;
-    const px = 50 + (r / 128) * 50 * Math.cos(rad);
-    const py = 50 + (r / 128) * 50 * Math.sin(rad);
-    marker.style.left = px + '%';
-    marker.style.top = py + '%';
-    marker.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-    drawTicks();
-    localStorage.setItem('ritual_grind', newGrind);
-  }
-
-  function drawTicks() {
-    const g = document.getElementById('tick-marks');
-    g.innerHTML = '';
-    const cx = 128, cy = 128, r = 118;
-    for (let i = 0; i <= (MAX_GRIND - MIN_GRIND) * 2; i++) {
-      const grind = MIN_GRIND + i * 0.5;
-      const angle = grindToAngle(grind);
-      const rad = (angle - 90) * Math.PI / 180;
-      const isMajor = Number.isInteger(grind);
-      const len = isMajor ? 10 : 5;
-      const x1 = cx + (r - len) * Math.cos(rad);
-      const y1 = cy + (r - len) * Math.sin(rad);
-      const x2 = cx + r * Math.cos(rad);
-      const y2 = cy + r * Math.sin(rad);
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-      line.setAttribute('stroke', grind <= grindSetting ? '#F1DFD3' : '#504442');
-      line.setAttribute('stroke-width', isMajor ? 2 : 1);
-      line.setAttribute('stroke-linecap', 'round');
+  function drawTicks(){
+    const g=document.getElementById('tick-marks'); g.innerHTML='';
+    const cx=128,cy=128,r=118;
+    for(let i=0;i<=(MAX_GRIND-MIN_GRIND)*2;i++){
+      const grind=MIN_GRIND+i*0.5, angle=grindToAngle(grind), rad=(angle-90)*Math.PI/180;
+      const isMajor=Number.isInteger(grind), len=isMajor?10:5;
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',cx+(r-len)*Math.cos(rad)); line.setAttribute('y1',cy+(r-len)*Math.sin(rad));
+      line.setAttribute('x2',cx+r*Math.cos(rad)); line.setAttribute('y2',cy+r*Math.sin(rad));
+      line.setAttribute('stroke',grind<=grindSetting?'#F1DFD3':'#504442');
+      line.setAttribute('stroke-width',isMajor?2:1); line.setAttribute('stroke-linecap','round');
       g.appendChild(line);
     }
   }
-
-  const dialEl = document.getElementById('dial-container');
-
-  dialEl.addEventListener('mousedown', e => {
-    if (e.target.id === 'grind-input') return;
-    isDragging = true;
-    lastAngle = getPointerAngle(e, dialEl.getBoundingClientRect());
-  });
-
-  dialEl.addEventListener('touchstart', e => {
-    if (e.target.id === 'grind-input') return;
-    isDragging = true;
-    lastAngle = getPointerAngle(e, dialEl.getBoundingClientRect());
-  }, { passive: true });
-
-  window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    const angle = getPointerAngle(e, dialEl.getBoundingClientRect());
-    let delta = angle - lastAngle;
-    if (delta > 180) delta -= 360;
-    if (delta < -180) delta += 360;
-    lastAngle = angle;
-    updateDial(grindSetting + delta / DEGREES_PER_UNIT);
-  });
-
-  window.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    const angle = getPointerAngle(e, dialEl.getBoundingClientRect());
-    let delta = angle - lastAngle;
-    if (delta > 180) delta -= 360;
-    if (delta < -180) delta += 360;
-    lastAngle = angle;
-    updateDial(grindSetting + delta / DEGREES_PER_UNIT);
-  }, { passive: true });
-
-  window.addEventListener('mouseup', () => { isDragging = false; });
-  window.addEventListener('touchend', () => { isDragging = false; });
-
-  function focusGrindInput() {
-    document.getElementById('grind-input').select();
-  }
-
-  function blurGrindInput() {
-    let val = parseFloat(document.getElementById('grind-input').value);
-    if (isNaN(val)) val = grindSetting;
-    updateDial(val);
-  }
-
-  function onGrindInputChange() {
-    let val = parseFloat(document.getElementById('grind-input').value);
-    if (!isNaN(val)) updateDial(val);
-  }
+  const dialEl=document.getElementById('dial-container');
+  dialEl.addEventListener('mousedown',e=>{if(e.target.id==='grind-input')return;isDragging=true;lastAngle=getPointerAngle(e,dialEl.getBoundingClientRect());});
+  dialEl.addEventListener('touchstart',e=>{if(e.target.id==='grind-input')return;isDragging=true;lastAngle=getPointerAngle(e,dialEl.getBoundingClientRect());},{passive:true});
+  window.addEventListener('mousemove',e=>{if(!isDragging)return;const a=getPointerAngle(e,dialEl.getBoundingClientRect());let d=a-lastAngle;if(d>180)d-=360;if(d<-180)d+=360;lastAngle=a;updateDial(grindSetting+d/DEGREES_PER_UNIT);});
+  window.addEventListener('touchmove',e=>{if(!isDragging)return;const a=getPointerAngle(e,dialEl.getBoundingClientRect());let d=a-lastAngle;if(d>180)d-=360;if(d<-180)d+=360;lastAngle=a;updateDial(grindSetting+d/DEGREES_PER_UNIT);},{passive:true});
+  window.addEventListener('mouseup',()=>{isDragging=false;});
+  window.addEventListener('touchend',()=>{isDragging=false;});
+  function focusGrindInput(){document.getElementById('grind-input').select();}
+  function blurGrindInput(){let v=parseFloat(document.getElementById('grind-input').value);if(isNaN(v))v=grindSetting;updateDial(v);}
+  function onGrindInputChange(){let v=parseFloat(document.getElementById('grind-input').value);if(!isNaN(v))updateDial(v);}
 
   // ── Toast ─────────────────────────────────────────────────
-  function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.remove('hidden', 'toast-anim');
-    void toast.offsetWidth;
-    toast.classList.add('toast-anim');
-    setTimeout(() => toast.classList.add('hidden'), 2700);
+  function showToast(msg){
+    const t=document.getElementById('toast'); t.textContent=msg;
+    t.classList.remove('hidden','toast-anim'); void t.offsetWidth; t.classList.add('toast-anim');
+    setTimeout(()=>t.classList.add('hidden'),2700);
   }
 
   // ── Init ──────────────────────────────────────────────────
-  const savedGrind = parseFloat(localStorage.getItem('ritual_grind')) || 18.5;
-  updateDial(savedGrind);
+  updateDial(parseFloat(localStorage.getItem('ritual_grind'))||18.5);
   loadLastExtraction();
   loadHistory();
 </script>
