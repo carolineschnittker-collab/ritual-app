@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ritual — edit coffee</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{
+      extend:{
+        colors:{
+          "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
+          "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
+          "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
+          "surface-container":"#201f1f","outline":"#9c8d8a","on-surface":"#e5e2e1",
+          "secondary-container":"#5b403c","on-background":"#e5e2e1","inverse-surface":"#e5e2e1",
+          "on-secondary-container":"#d1ada7","inverse-on-surface":"#313030","on-primary-container":"#3e2c26",
+          "on-surface-variant":"#d4c3bf","surface-container-lowest":"#0e0e0e",
+          "surface-container-highest":"#353534","surface-container-low":"#1c1b1b",
+          "tertiary":"#cfc4c0","error":"#ffb4ab","surface-bright":"#393939","on-tertiary":"#352f2d"
+        },
+        fontFamily:{"headline":["Manrope"],"body":["Manrope"],"label":["Manrope"]},
+        borderRadius:{"DEFAULT":"0.5rem","lg":"0.75rem","xl":"1.5rem","full":"9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
+  .field-input{width:100%;background:#1c1b1b;border:none;border-radius:0.75rem;padding:0.75rem 1rem;color:#e5e2e1;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:500;outline:none;transition:box-shadow 0.2s;}
+  .field-input:focus{box-shadow:0 0 0 1px rgba(241,223,211,0.3);}
+  .field-input::placeholder{color:rgba(156,141,138,0.4);}
+  select.field-input{appearance:none;-webkit-appearance:none;cursor:pointer;}
+  .field-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#F1DFD3;margin-bottom:0.5rem;margin-left:0.25rem;}
+  /* Range slider */
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:#353534;border-radius:9999px;outline:none;cursor:pointer;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:#F1DFD3;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;background:#F1DFD3;border-radius:50%;border:none;cursor:pointer;}
+  /* Date input */
+  input[type=text].date-field{letter-spacing:0.05em;}
+</style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
+  <div class="flex items-center justify-between w-full">
+    <a href="index.html" class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">arrow_back</span></a>
+    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">settings</span></button>
+  </div>
+</header>
+
+<main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
+  <div class="mb-8">
+    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">currently brewing</h2>
+  </div>
+
+  <div class="space-y-8">
+
+    <!-- Bean Name -->
+    <div>
+      <label class="field-label">Bean Name</label>
+      <input id="bean-name" class="field-input" type="text" placeholder="e.g. Ethiopia Yirgacheffe"/>
+    </div>
+
+    <!-- Roaster & Region -->
+    <div class="grid grid-cols-5 gap-4">
+      <div class="col-span-3">
+        <label class="field-label">Roaster</label>
+        <input id="roaster" class="field-input" type="text" placeholder="e.g. Onyx Coffee Lab"/>
+      </div>
+      <div class="col-span-2">
+        <label class="field-label">Region</label>
+        <input id="region" class="field-input" type="text" placeholder="e.g. Yirgacheffe"/>
+      </div>
+    </div>
+
+    <!-- Process -->
+    <div>
+      <label class="field-label">Process</label>
+      <div class="relative">
+        <select id="process" class="field-input pr-10">
+          <option value="">Select process...</option>
+          <option>Washed (Wet)</option>
+          <option>Natural (Dry)</option>
+          <option>Honey</option>
+          <option>Anaerobic Natural</option>
+          <option>Anaerobic Washed</option>
+          <option>Carbonic Maceration</option>
+          <option>Wet-Hulled (Giling Basah)</option>
+          <option>Pulped Natural</option>
+          <option>Double Fermentation</option>
+          <option>Experimental</option>
+        </select>
+        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary/60 text-xl">expand_more</span>
+      </div>
+    </div>
+
+    <!-- Roast Level -->
+    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+      <div class="flex justify-between items-end mb-5">
+        <label class="field-label mb-0">Roast Level</label>
+        <span id="roast-label" class="text-primary font-extrabold text-sm tracking-tight">Medium-Light</span>
+      </div>
+      <input id="roast-slider" type="range" min="1" max="5" step="1" value="2" oninput="updateRoastLabel(this.value)"/>
+      <div class="flex justify-between mt-3 px-0.5">
+        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Light</span>
+        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Medium</span>
+        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Dark</span>
+      </div>
+    </div>
+
+    <!-- Bag Weight -->
+    <div>
+      <label class="field-label">Bag Weight (g)</label>
+      <input id="bag-weight" class="field-input" type="number" placeholder="250"/>
+    </div>
+
+    <!-- Roast Date -->
+    <div>
+      <label class="field-label">Roast Date</label>
+      <input id="roast-date" class="field-input date-field" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
+    </div>
+
+    <!-- Date Opened -->
+    <div>
+      <label class="field-label">Date Opened</label>
+      <input id="date-opened" class="field-input date-field" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
+    </div>
+
+    <!-- Buttons -->
+    <div class="pt-4 flex flex-col gap-3">
+      <button onclick="saveBean()" class="w-full py-4 bg-primary text-on-primary font-extrabold rounded-xl uppercase tracking-widest text-xs shadow-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
+        Save Changes
+      </button>
+      <a href="index.html" class="w-full py-4 bg-surface-container-high text-on-surface font-extrabold rounded-xl uppercase tracking-widest text-xs hover:bg-surface-container-highest transition-colors active:scale-[0.98] text-center block">
+        Discard
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
+  </a>
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Journal</span>
+  </a>
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
+  </a>
+</nav>
+
+<script>
+  const ROAST_LABELS = ['Light','Medium-Light','Medium','Medium-Dark','Dark'];
+
+  function updateRoastLabel(v){
+    document.getElementById('roast-label').textContent = ROAST_LABELS[parseInt(v)-1];
+  }
+
+  // Auto-slash date formatting
+  function setupDateInput(id){
+    const el=document.getElementById(id);
+    el.addEventListener('input',function(e){
+      let v=this.value.replace(/\D/g,'');
+      if(v.length>2) v=v.substring(0,2)+'/'+v.substring(2);
+      if(v.length>5) v=v.substring(0,5)+'/'+v.substring(5);
+      if(v.length>10) v=v.substring(0,10);
+      this.value=v;
+    });
+  }
+  setupDateInput('roast-date');
+  setupDateInput('date-opened');
+
+  // Load existing bean data
+  function loadBean(){
+    const bean=JSON.parse(localStorage.getItem('ritual_current_bean')||'null');
+    if(!bean) return;
+    if(bean.name) document.getElementById('bean-name').value=bean.name;
+    if(bean.roaster) document.getElementById('roaster').value=bean.roaster;
+    if(bean.region) document.getElementById('region').value=bean.region;
+    if(bean.process){
+      const sel=document.getElementById('process');
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].value===bean.process||sel.options[i].text===bean.process){sel.selectedIndex=i;break;}
+      }
+    }
+    if(bean.roast_level){
+      const idx=ROAST_LABELS.indexOf(bean.roast_level);
+      if(idx>=0){document.getElementById('roast-slider').value=idx+1;updateRoastLabel(idx+1);}
+    }
+    if(bean.bag_weight) document.getElementById('bag-weight').value=bean.bag_weight;
+    if(bean.roast_date) document.getElementById('roast-date').value=bean.roast_date;
+    if(bean.date_opened) document.getElementById('date-opened').value=bean.date_opened;
+  }
+
+  function saveBean(){
+    const name=document.getElementById('bean-name').value.trim();
+    if(!name){alert('Please enter a bean name.');return;}
+    const roastIdx=parseInt(document.getElementById('roast-slider').value);
+    const bean={
+      name,
+      roaster:document.getElementById('roaster').value.trim()||null,
+      region:document.getElementById('region').value.trim()||null,
+      process:document.getElementById('process').value||null,
+      roast_level:ROAST_LABELS[roastIdx-1],
+      bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
+      roast_date:document.getElementById('roast-date').value||null,
+      date_opened:document.getElementById('date-opened').value||null,
+    };
+    localStorage.setItem('ritual_current_bean',JSON.stringify(bean));
+    window.location.href='index.html';
+  }
+
+  loadBean();
+</script>
+</body>
+</html>
