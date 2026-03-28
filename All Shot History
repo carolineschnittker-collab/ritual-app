@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ritual — shot history</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{
+      extend:{
+        colors:{
+          "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
+          "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
+          "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
+          "surface-container":"#201f1f","outline":"#9c8d8a","on-surface":"#e5e2e1",
+          "secondary-container":"#5b403c","on-background":"#e5e2e1","inverse-surface":"#e5e2e1",
+          "on-secondary-container":"#d1ada7","inverse-on-surface":"#313030","on-primary-container":"#3e2c26",
+          "on-surface-variant":"#d4c3bf","surface-container-lowest":"#0e0e0e",
+          "surface-container-highest":"#353534","surface-container-low":"#1c1b1b",
+          "tertiary":"#cfc4c0","error":"#ffb4ab","surface-bright":"#393939","on-tertiary":"#352f2d"
+        },
+        fontFamily:{"headline":["Manrope"],"body":["Manrope"],"label":["Manrope"]},
+        borderRadius:{"DEFAULT":"0.5rem","lg":"0.75rem","xl":"1.5rem","full":"9999px"},
+      },
+    },
+  }
+</script>
+<style>
+  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
+  body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#131313;}::-webkit-scrollbar-thumb{background:#353534;border-radius:10px;}
+  @keyframes slide-up-fade{0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);}}
+  .toast-anim{animation:slide-up-fade 2.6s ease forwards;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
+  .modal-sheet{background:#1c1b1b;border-radius:1.5rem 1.5rem 0 0;padding:2rem;width:100%;max-width:480px;border:1px solid rgba(80,68,66,0.3);}
+</style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+
+<div id="confirm-modal" class="modal-overlay hidden">
+  <div class="modal-sheet space-y-6 text-center">
+    <div class="space-y-2">
+      <p class="text-[10px] uppercase tracking-[0.2em] text-error font-bold">Delete Shot?</p>
+      <p class="text-sm text-outline font-medium">This can't be undone.</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="closeConfirmModal()" class="flex-1 bg-surface-container-high text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Cancel</button>
+      <button onclick="executeDelete()" class="flex-1 py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95" style="background:#93000a;color:#ffdad6;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
+  <div class="flex items-center justify-between w-full">
+    <a href="index.html" class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">arrow_back</span></a>
+    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
+    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">settings</span></button>
+  </div>
+</header>
+
+<main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
+  <div class="mb-8">
+    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">shot history</h2>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-8 relative">
+    <div class="flex items-center bg-surface-container-low px-5 py-3 rounded-xl border border-outline-variant/10 focus-within:ring-1 ring-primary/30 transition-all">
+      <span class="material-symbols-outlined text-primary/60 mr-3 text-xl">search</span>
+      <input id="search-input" class="bg-transparent border-none p-0 focus:ring-0 outline-none w-full text-on-surface placeholder:text-outline/40 text-sm font-medium" placeholder="Search by bean, brewer, notes..." type="text" oninput="filterShots()"/>
+    </div>
+  </div>
+
+  <div id="shot-list" class="flex flex-col gap-4">
+    <p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Loading...</p>
+  </div>
+
+  <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
+  </a>
+  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-6 py-2 transition-transform active:scale-95" href="#">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Journal</span>
+  </a>
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
+  </a>
+</nav>
+
+<script>
+  const SUPABASE_URL='https://pblsuaypnzvbdjbnqghv.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+  let allShots=[];
+  let pendingDeleteId=null;
+
+  const BREWER_COLORS={
+    'Caro':'color:#F0BD8B;background:rgba(240,189,139,0.12);border:1px solid rgba(240,189,139,0.25)',
+    'Ross':'color:#F1DFD3;background:rgba(241,223,211,0.08);border:1px solid rgba(241,223,211,0.2)',
+  };
+
+  function ratingChipStyle(r){
+    const m={
+      'Balanced':'color:#F1DFD3;background:rgba(241,223,211,0.15)',
+      'Sour':'color:#F0BD8B;background:rgba(240,189,139,0.15)',
+      'Bitter':'color:#9c8d8a;background:#2a2a2a',
+      'Under-extracted':'color:#F0BD8B;background:rgba(240,189,139,0.15)',
+      'Over-extracted':'color:#9c8d8a;background:#2a2a2a',
+      'Unrated':'color:#9c8d8a;background:#2a2a2a',
+    };
+    return m[r]||m['Unrated'];
+  }
+
+  function renderShots(shots){
+    const container=document.getElementById('shot-list');
+    if(!shots||shots.length===0){
+      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">No shots found</p>';
+      return;
+    }
+    container.innerHTML=shots.map(shot=>{
+      const dt=new Date(shot.created_at);
+      const date=dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+      const time=dt.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:true});
+
+      // Tags row
+      const tags=[];
+      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${BREWER_COLORS[shot.brewer]||BREWER_COLORS['Ross']}">${shot.brewer}</span>`);
+      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Speed: ${shot.grind_speed}</span>`);
+      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Grind ${shot.grind_setting}</span>`);
+      if(shot.rating&&shot.rating!=='Unrated'){
+        shot.rating.split(',').forEach(r=>{
+          const rt=r.trim();
+          tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-widest" style="${ratingChipStyle(rt)}">${rt}</span>`);
+        });
+      }
+
+      const doseYield=(shot.dose_in||shot.yield_out)?`
+        <div>
+          <span class="block text-[10px] uppercase font-bold tracking-widest text-outline/60 mb-1">Dose In / Out</span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-2xl font-semibold tracking-tight text-on-surface">${shot.dose_in||'—'}<span class="text-xs text-primary/70 ml-0.5">g</span></span>
+            <span class="text-outline/30 font-thin px-1">/</span>
+            <span class="text-2xl font-semibold tracking-tight text-on-surface">${shot.yield_out||'—'}<span class="text-xs text-primary/70 ml-0.5">g</span></span>
+          </div>
+        </div>`:'' ;
+
+      return `<article class="bg-surface-container-low rounded-[1.25rem] p-6 border border-outline-variant/5 relative" id="card-${shot.id}">
+        <button onclick="confirmDelete('${shot.id}')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors opacity-40 hover:opacity-100">
+          <span class="material-symbols-outlined text-outline text-lg">delete</span>
+        </button>
+        <div class="mb-5">
+          <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-1">${date} • ${time}</span>
+          <h3 class="text-xl font-extrabold tracking-tight text-on-surface leading-tight">${shot.bean_name||'Unknown Bean'}</h3>
+        </div>
+        <div class="flex gap-10 mb-5">
+          <div>
+            <span class="block text-[10px] uppercase font-bold tracking-widest text-outline/60 mb-1">Extraction</span>
+            <div class="flex items-baseline">
+              <span class="text-4xl font-light tracking-tighter text-on-surface">${shot.duration}</span>
+              <span class="text-lg text-primary ml-0.5 font-medium">s</span>
+            </div>
+          </div>
+          ${doseYield}
+        </div>
+        ${tags.length>0?`<div class="flex flex-wrap gap-2 mb-5">${tags.join('')}</div>`:''}
+        ${shot.notes?`<div class="bg-surface-container-lowest/60 p-4 rounded-xl border border-outline-variant/5">
+          <p class="text-[13px] leading-relaxed text-on-surface-variant italic font-medium">"${shot.notes}"</p>
+        </div>`:''}
+      </article>`;
+    }).join('');
+  }
+
+  async function loadShots(){
+    const{data,error}=await db.from('shots').select('*').order('created_at',{ascending:false});
+    if(error){console.error(error);document.getElementById('shot-list').innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Could not load shots</p>';return;}
+    allShots=data||[];
+    renderShots(allShots);
+  }
+
+  function filterShots(){
+    const q=document.getElementById('search-input').value.toLowerCase().trim();
+    if(!q){renderShots(allShots);return;}
+    const filtered=allShots.filter(s=>{
+      return (s.bean_name||'').toLowerCase().includes(q)||
+             (s.brewer||'').toLowerCase().includes(q)||
+             (s.rating||'').toLowerCase().includes(q)||
+             (s.notes||'').toLowerCase().includes(q)||
+             (s.grind_speed||'').toLowerCase().includes(q);
+    });
+    renderShots(filtered);
+  }
+
+  function confirmDelete(id){
+    pendingDeleteId=id;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+  }
+  function closeConfirmModal(){
+    document.getElementById('confirm-modal').classList.add('hidden');
+    pendingDeleteId=null;
+  }
+  async function executeDelete(){
+    document.getElementById('confirm-modal').classList.add('hidden');
+    if(!pendingDeleteId)return;
+    const{error}=await db.from('shots').delete().eq('id',pendingDeleteId);
+    if(error){console.error(error);showToast('Could not delete — try again');pendingDeleteId=null;return;}
+    showToast('Shot deleted');
+    pendingDeleteId=null;
+    loadShots();
+  }
+
+  function showToast(msg){
+    const t=document.getElementById('toast');t.textContent=msg;
+    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
+    setTimeout(()=>t.classList.add('hidden'),2700);
+  }
+
+  loadShots();
+</script>
+</body>
+</html>
