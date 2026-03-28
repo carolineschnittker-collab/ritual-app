@@ -201,10 +201,10 @@
   </section>
 
   <div class="pb-10 pt-4">
-    <button class="w-full bg-primary text-on-primary py-4 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all active:scale-[0.98]">
+    <a href="edit-bean.html" class="w-full bg-white text-black py-4 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all active:scale-[0.98] text-center block uppercase tracking-[0.15em] text-xs font-extrabold">
       <span class="material-symbols-outlined font-bold">add_circle</span>
-      <span class="font-extrabold text-sm uppercase tracking-[0.15em]">Add New Coffee</span>
-    </button>
+      <span>Add New Coffee</span>
+    </a>
   </div>
 </main>
 
@@ -382,7 +382,6 @@
     showToast('Shot deleted');loadHistory();loadLastExtraction();
   }
 
-  // Dial with confirm-after-idle
   let grindSetting=18.5,isDragging=false,lastAngle=0,grindConfirmTimer=null,grindPendingValue=null;
   const MIN_GRIND=1,MAX_GRIND=30,DEGREES_PER_UNIT=300/(MAX_GRIND-MIN_GRIND);
   function grindToAngle(g){return(g-MIN_GRIND)*DEGREES_PER_UNIT-150;}
@@ -405,7 +404,7 @@
     grindConfirmTimer=setTimeout(()=>{
       document.getElementById('grind-confirm-value').textContent=g;
       document.getElementById('grind-confirm-modal').classList.remove('hidden');
-    },500); // CHANGED FROM 1500 TO 500
+    },1500);
   }
   function confirmGrindUpdate(){
     document.getElementById('grind-confirm-modal').classList.add('hidden');
@@ -440,9 +439,7 @@
   function focusGrindInput(){document.getElementById('grind-input').select();}
   function blurGrindInput(){let v=parseFloat(document.getElementById('grind-input').value);if(isNaN(v))v=grindSetting;updateDial(v,false);scheduleGrindConfirm(v);}
   function onGrindInputChange(){let v=parseFloat(document.getElementById('grind-input').value);if(!isNaN(v)){updateDial(v,false);scheduleGrindConfirm(v);}}
-
   function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');setTimeout(()=>t.classList.add('hidden'),2700);}
-
   updateDial(parseFloat(localStorage.getItem('ritual_grind'))||18.5,false);
   loadBrewingBean();loadLastExtraction();loadHistory();
 </script>
