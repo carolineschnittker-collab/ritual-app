@@ -68,7 +68,6 @@
     <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">shot history</h2>
   </div>
 
-  <!-- Search -->
   <div class="mb-8 relative">
     <div class="flex items-center bg-surface-container-low px-5 py-3 rounded-xl border border-outline-variant/10 focus-within:ring-1 ring-primary/30 transition-all">
       <span class="material-symbols-outlined text-primary/60 mr-3 text-xl">search</span>
@@ -103,10 +102,8 @@
   let allShots=[];
   let pendingDeleteId=null;
 
-  const BREWER_COLORS={
-    'Caro':'color:#F0BD8B;background:rgba(240,189,139,0.12);border:1px solid rgba(240,189,139,0.25)',
-    'Ross':'color:#F1DFD3;background:rgba(241,223,211,0.08);border:1px solid rgba(241,223,211,0.2)',
-  };
+  // NEUTRAL STYLE FOR BREWER AND SYSTEM TAGS
+  const NEUTRAL_TAG = 'color:#e5e2e1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)';
 
   function ratingChipStyle(r){
     const m={
@@ -131,11 +128,13 @@
       const date=dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
       const time=dt.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:true});
 
-      // Tags row
       const tags=[];
-      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${BREWER_COLORS[shot.brewer]||BREWER_COLORS['Ross']}">${shot.brewer}</span>`);
-      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Speed: ${shot.grind_speed}</span>`);
-      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Grind ${shot.grind_setting}</span>`);
+      // BREWER IS NOW NEUTRAL
+      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">${shot.brewer}</span>`);
+      // UPDATED LABELS FOR SPEED AND SETTING
+      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">Grind Speed: ${shot.grind_speed}</span>`);
+      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">Grind Setting: ${shot.grind_setting}</span>`);
+      
       if(shot.rating&&shot.rating!=='Unrated'){
         shot.rating.split(',').forEach(r=>{
           const rt=r.trim();
