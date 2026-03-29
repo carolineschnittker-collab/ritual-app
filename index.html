@@ -10,10 +10,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script id="tailwind-config">
   tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
+    darkMode:"class",
+    theme:{
+      extend:{
+        colors:{
           "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
           "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
           "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
@@ -49,10 +49,12 @@
   .shot-row-delete-bg span{color:#ffdad6;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
   .shot-row{position:relative;touch-action:pan-y;background:#1c1b1b;border-radius:0.75rem;transition:transform 0.15s ease;}
   .shot-row.swiping{transition:none;}
+  .tag-btn{transition:all 0.15s ease;}
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-24">
 
+<!-- Brewer modal -->
 <div id="brewer-modal" class="modal-overlay hidden">
   <div class="modal-sheet space-y-6">
     <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold text-center">Who's pulling this shot?</p>
@@ -64,6 +66,7 @@
   </div>
 </div>
 
+<!-- Confirm delete modal -->
 <div id="confirm-modal" class="modal-overlay hidden">
   <div class="modal-sheet space-y-6 text-center">
     <div class="space-y-2">
@@ -77,6 +80,7 @@
   </div>
 </div>
 
+<!-- Grind confirm modal -->
 <div id="grind-confirm-modal" class="modal-overlay hidden">
   <div class="modal-sheet space-y-6 text-center">
     <div class="space-y-2">
@@ -100,28 +104,40 @@
 
 <main class="px-6 max-w-2xl mx-auto space-y-12 pt-24">
 
+  <!-- Currently Brewing -->
   <section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
     <div class="flex justify-between items-start">
       <div class="space-y-1">
         <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Currently Brewing</p>
-        <h3 id="brew-name" class="text-2xl font-extrabold text-on-surface tracking-tight">Ethiopia Yirgacheffe</h3>
-        <p id="brew-detail" class="text-sm text-outline-variant font-medium italic">Washed process • Light roast</p>
+        <h3 id="brew-name" class="text-2xl font-extrabold text-on-surface tracking-tight">—</h3>
+        <p id="brew-detail" class="text-sm text-outline-variant font-medium italic"></p>
       </div>
       <a href="edit-bean.html" class="w-10 h-10 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
         <span class="material-symbols-outlined text-primary text-lg">edit</span>
       </a>
     </div>
-    <div class="pt-4 border-t border-outline-variant/10 flex justify-between items-end">
+    <!-- Last extraction + inventory replacing progress bar -->
+    <div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
       <div class="space-y-1">
-        <p class="text-[10px] text-outline font-bold uppercase tracking-widest">inventory status</p>
-        <p class="text-xl font-extrabold text-on-surface">12 <span class="text-xs font-medium text-outline">shots left</span></p>
+        <div class="flex items-center gap-1.5 opacity-60">
+          <span class="material-symbols-outlined text-sm">history</span>
+          <p class="text-[10px] uppercase tracking-widest font-bold">last extraction</p>
+        </div>
+        <div class="flex items-baseline gap-1">
+          <span id="last-extraction-time" class="text-3xl font-extrabold text-primary">--</span>
+          <span id="last-extraction-unit" class="text-base font-bold text-primary opacity-60"></span>
+        </div>
+        <span id="last-extraction-brewer" class="text-[9px] uppercase tracking-widest text-outline font-bold opacity-70"></span>
       </div>
-      <div class="w-32 h-2 bg-surface-container rounded-full overflow-hidden">
-        <div class="bg-primary h-full w-[40%] rounded-full"></div>
+      <div class="text-right space-y-1">
+        <p class="text-[10px] text-outline font-bold uppercase tracking-widest">inventory</p>
+        <p id="shots-left" class="text-3xl font-extrabold text-on-surface">—</p>
+        <p class="text-[9px] text-outline font-bold uppercase tracking-widest">shots left</p>
       </div>
     </div>
   </section>
 
+  <!-- Dial — free, no box -->
   <section class="flex flex-col items-center">
     <div id="dial-container" class="dial-container relative w-64 h-64 flex items-center justify-center">
       <div class="absolute inset-0 rounded-full border-[10px] border-surface-container-low dial-ring"></div>
@@ -133,18 +149,9 @@
       </div>
       <div id="dial-marker" class="absolute w-1.5 h-5 bg-primary rounded-full" style="top:8px;left:50%;transform:translateX(-50%);"></div>
     </div>
-    <div class="mt-6 flex flex-col items-center gap-1">
-      <div class="flex items-center gap-2 opacity-60">
-        <span class="material-symbols-outlined text-sm">history</span>
-        <p class="text-[10px] uppercase tracking-widest font-bold">last extraction</p>
-      </div>
-      <div class="flex items-baseline gap-1">
-        <span id="last-extraction-time" class="text-4xl font-extrabold text-primary">--</span>
-        <span id="last-extraction-unit" class="text-xl font-bold text-primary opacity-60"></span>
-      </div>
-      <span id="last-extraction-brewer" class="text-[10px] uppercase tracking-widest text-outline font-bold opacity-60"></span>
-    </div>
-    <div class="w-full mt-10 bg-surface-container-low rounded-xl p-6 flex flex-col items-center shadow-lg border border-outline-variant/10">
+
+    <!-- Timer — free, no box -->
+    <div class="w-full mt-10 flex flex-col items-center">
       <span id="timer-display" class="text-5xl font-mono font-bold tracking-tight text-on-surface mb-6">00:00.0</span>
       <div class="flex gap-4 w-full max-w-[280px]">
         <button onclick="resetTimer()" class="flex-1 bg-surface-container-high text-on-surface px-6 py-3 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all active:scale-95">Reset</button>
@@ -154,25 +161,40 @@
     <div id="toast" class="hidden mt-4 px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center"></div>
   </section>
 
+  <!-- Rate & Notes -->
   <section class="space-y-6">
+
+    <!-- Rate Last Shot — full multi-select descriptor list -->
     <div class="space-y-3">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Rate Last Shot</p>
-      <div class="flex flex-wrap gap-2">
-        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Bitter</button>
-        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Sour</button>
-        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Balanced</button>
-        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Under-extracted</button>
-        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Over-extracted</button>
+      <div class="flex flex-wrap gap-2" id="rating-tags">
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Bright</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Sweet</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Sour</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Bitter</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Ashy</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Thin</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Silky</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Gritty</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Balanced</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Acidic</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Chalky</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Under-extracted</button>
+        <button onclick="toggleTag(this,'rating')" data-group="rating" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Over-extracted</button>
       </div>
     </div>
+
+    <!-- Grind Speed -->
     <div class="space-y-3">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Grind Speed</p>
       <div class="flex flex-wrap gap-2">
-        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Fast</button>
-        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Normal</button>
-        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all">Slow</button>
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Fast</button>
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Normal</button>
+        <button onclick="toggleTag(this,'grind-speed')" data-group="grind-speed" class="tag-btn px-5 py-2.5 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Slow</button>
       </div>
     </div>
+
+    <!-- Dose in / out -->
     <div class="flex gap-4">
       <div class="flex-1 space-y-2">
         <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Dose In (g)</p>
@@ -183,13 +205,17 @@
         <input id="yield-out" type="number" step="0.1" placeholder="36.0" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
       </div>
     </div>
+
+    <!-- Notes -->
     <div class="space-y-3">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">General Notes</p>
       <textarea id="shot-notes" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 h-20 resize-none outline-none" placeholder="Mouthfeel, floral notes..."></textarea>
     </div>
+
     <button onclick="saveShot()" class="w-full border border-primary/30 text-primary py-3 rounded-xl transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">Save Shot</button>
   </section>
 
+  <!-- Shot History -->
   <section class="space-y-6">
     <div class="flex justify-between items-end border-b border-outline-variant/10 pb-4">
       <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Recent Shot History</p>
@@ -200,10 +226,10 @@
     </div>
   </section>
 
-  <div class="pb-10 pt-4">
-    <a href="edit-bean.html" class="w-full bg-white text-black py-4 rounded-xl flex items-center justify-center gap-3 shadow-xl transition-all active:scale-[0.98] text-center block uppercase tracking-[0.15em] text-xs font-extrabold">
-      <span class="material-symbols-outlined font-bold">add_circle</span>
-      <span>Add New Coffee</span>
+  <!-- Add New Coffee — same size as Save Shot, primary colour -->
+  <div class="pb-10 pt-2">
+    <a href="edit-bean.html" class="w-full border border-primary/30 bg-primary text-on-primary py-3 rounded-xl flex items-center justify-center transition-all active:scale-[0.98] hover:opacity-90 text-xs font-extrabold uppercase tracking-widest">
+      Add New Coffee
     </a>
   </div>
 </main>
@@ -225,17 +251,38 @@
   const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
   const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-  function loadBrewingBean(){
-    const bean=JSON.parse(localStorage.getItem('ritual_current_bean')||'null');
-    if(bean){
-      document.getElementById('brew-name').textContent=bean.name||'Unknown Bean';
-      const parts=[];
-      if(bean.process)parts.push(bean.process+' process');
-      if(bean.roast_level)parts.push(bean.roast_level+' roast');
-      document.getElementById('brew-detail').textContent=parts.join(' • ')||'';
-    }
+  // ── Load bean from Supabase ───────────────────────────────
+  async function loadBrewingBean(){
+    const{data,error}=await db.from('current_bean').select('*').eq('id',1).single();
+    if(error||!data) return;
+    const bean=data;
+    document.getElementById('brew-name').textContent=bean.name||'—';
+    const parts=[];
+    if(bean.process) parts.push(bean.process+' process');
+    if(bean.roast_level) parts.push(bean.roast_level+' roast');
+    document.getElementById('brew-detail').textContent=parts.join(' • ')||'';
+    updateInventory(bean.bag_weight);
   }
 
+  async function updateInventory(bagWeight){
+    if(!bagWeight){document.getElementById('shots-left').textContent='—';return;}
+    const totalShots=Math.floor(bagWeight/20);
+    // Count shots pulled for current bean since date_opened
+    const{data,error}=await db.from('shots').select('id',{count:'exact',head:true});
+    const pulled=error?0:(data||[]).length;
+    // We count ALL shots as a simple proxy — good enough for now
+    const{count}=await db.from('shots').select('*',{count:'exact',head:true});
+    const shotsLeft=Math.max(0,totalShots-(count||0));
+    document.getElementById('shots-left').textContent=shotsLeft;
+  }
+
+  // Recalculate inventory after saving a shot
+  async function refreshInventory(){
+    const{data}=await db.from('current_bean').select('bag_weight').eq('id',1).single();
+    if(data) updateInventory(data.bag_weight);
+  }
+
+  // ── Timer ─────────────────────────────────────────────────
   let timerInterval=null,timerRunning=false,elapsedMs=0,startTime=null,pendingDuration=0;
   function toggleTimer(){timerRunning?stopTimer():startTimer();}
   function startTimer(){
@@ -264,43 +311,62 @@
     document.getElementById('timer-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+tenths;
   }
 
-  const multiGroups=['rating'];
+  // ── Tags — all multi-select ───────────────────────────────
   function toggleTag(btn,group){
-    const isMulti=multiGroups.includes(group),active=btn.getAttribute('data-active')==='1';
-    if(!isMulti){
-      document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{b.style.backgroundColor='';b.style.color='#F1DFD3';b.removeAttribute('data-active');});
+    const active=btn.getAttribute('data-active')==='1';
+    // grind-speed is single select
+    if(group==='grind-speed'){
+      document.querySelectorAll('[data-group="grind-speed"]').forEach(b=>{b.style.backgroundColor='';b.style.color='#F1DFD3';b.removeAttribute('data-active');});
       if(!active){btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');}
     } else {
       if(active){btn.style.backgroundColor='';btn.style.color='#F1DFD3';btn.removeAttribute('data-active');}
       else{btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');}
     }
   }
-  function getSelectedTags(group){const out=[];document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{if(b.getAttribute('data-active')==='1')out.push(b.textContent.trim());});return out;}
-  function clearTags(group){document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{b.style.backgroundColor='';b.style.color='#F1DFD3';b.removeAttribute('data-active');});}
+  function getSelectedTags(group){
+    const out=[];
+    document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{if(b.getAttribute('data-active')==='1')out.push(b.textContent.trim());});
+    return out;
+  }
+  function clearTags(group){
+    document.querySelectorAll('[data-group="'+group+'"]').forEach(b=>{b.style.backgroundColor='';b.style.color='#F1DFD3';b.removeAttribute('data-active');});
+  }
 
-  function saveShot(){const s=pendingDuration||Math.round(elapsedMs/1000);if(s===0){showToast('Run a shot first!');return;}document.getElementById('brewer-modal').classList.remove('hidden');}
+  // ── Save shot ─────────────────────────────────────────────
+  function saveShot(){
+    const s=pendingDuration||Math.round(elapsedMs/1000);
+    if(s===0){showToast('Run a shot first!');return;}
+    document.getElementById('brewer-modal').classList.remove('hidden');
+  }
   function closeBrewerModal(){document.getElementById('brewer-modal').classList.add('hidden');}
   async function confirmSaveShot(brewer){
     closeBrewerModal();
     const seconds=pendingDuration||Math.round(elapsedMs/1000);
     const grind=parseFloat(document.getElementById('grind-input').value)||grindSetting;
     const beanName=document.getElementById('brew-name').textContent||'Unknown';
-    const shot={bean_name:beanName,grind_setting:grind,duration:seconds,
-      rating:(getSelectedTags('rating').join(', '))||'Unrated',
-      notes:document.getElementById('shot-notes').value||null,brewer,
+    const ratings=getSelectedTags('rating');
+    const shot={
+      bean_name:beanName,grind_setting:grind,duration:seconds,
+      rating:ratings.length>0?ratings.join(', '):'Unrated',
+      notes:document.getElementById('shot-notes').value||null,
+      brewer,
       grind_speed:getSelectedTags('grind-speed')[0]||null,
       dose_in:parseFloat(document.getElementById('dose-in').value)||null,
-      yield_out:parseFloat(document.getElementById('yield-out').value)||null};
+      yield_out:parseFloat(document.getElementById('yield-out').value)||null
+    };
     const{error}=await db.from('shots').insert([shot]).select();
     if(error){console.error(error);showToast('Error saving — try again');return;}
-    updateLastExtractionDisplay(seconds,brewer);showToast('Shot saved ✓');resetTimer();
-    clearTags('rating');clearTags('grind-speed');
+    updateLastExtractionDisplay(seconds,brewer);
+    showToast('Shot saved ✓');
+    resetTimer();clearTags('rating');clearTags('grind-speed');
     document.getElementById('shot-notes').value='';
     document.getElementById('dose-in').value='';
     document.getElementById('yield-out').value='';
     loadHistory();
+    refreshInventory();
   }
 
+  // ── Last extraction ───────────────────────────────────────
   function updateLastExtractionDisplay(s,brewer){
     document.getElementById('last-extraction-time').textContent=s;
     document.getElementById('last-extraction-unit').textContent='s';
@@ -311,11 +377,14 @@
     if(!error&&data&&data.length>0)updateLastExtractionDisplay(data[0].duration,data[0].brewer);
   }
 
+  // ── Shot history ──────────────────────────────────────────
   function ratingStyle(r){
     const m={'Balanced':'color:#F1DFD3;background:rgba(241,223,211,0.1)','Sour':'color:#F0BD8B;background:rgba(240,189,139,0.1)',
       'Bitter':'color:#9c8d8a;background:#2a2a2a','Under-extracted':'color:#F0BD8B;background:rgba(240,189,139,0.1)',
       'Over-extracted':'color:#9c8d8a;background:#2a2a2a','Unrated':'color:#9c8d8a;background:#2a2a2a'};
-    if(!r)return m['Unrated'];return m[r.split(',')[0].trim()]||m['Unrated'];
+    if(!r)return m['Unrated'];
+    const first=r.split(',')[0].trim();
+    return m[first]||'color:#9c8d8a;background:#2a2a2a';
   }
   async function loadHistory(){
     const container=document.getElementById('shot-history');
@@ -344,7 +413,7 @@
                 ${notePreview?`<span class="block text-[9px] text-outline/60 mt-0.5">${notePreview}</span>`:''}
               </div>
             </div>
-            <span class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest flex-shrink-0 ml-2" style="${ratingStyle(shot.rating)}">${shot.rating}</span>
+            <span class="px-3 py-1 text-[9px] font-extrabold rounded uppercase tracking-widest flex-shrink-0 ml-2" style="${ratingStyle(shot.rating)}">${(shot.rating||'Unrated').split(',')[0].trim()}</span>
           </div>
         </div>
       </div>`;
@@ -352,6 +421,7 @@
     shots.forEach(shot=>attachSwipe(shot.id));
   }
 
+  // ── Swipe to delete ───────────────────────────────────────
   const swipeState={};let pendingDeleteId=null;
   function attachSwipe(id){
     const row=document.getElementById('row-'+id);if(!row)return;
@@ -369,7 +439,7 @@
       if(row){row.style.transition='transform 0.15s ease';row.style.transform='translateX(-80px)';}
       const bg=document.getElementById('wrapper-'+id)?.querySelector('.shot-row-delete-bg');
       if(bg)bg.onclick=()=>{pendingDeleteId=id;document.getElementById('confirm-modal').classList.remove('hidden');};
-    } else {if(row){row.style.transition='transform 0.2s ease';row.style.transform='translateX(0)';setTimeout(()=>{if(row)row.style.transition='';},200);}}
+    } else{if(row){row.style.transition='transform 0.2s ease';row.style.transform='translateX(0)';setTimeout(()=>{if(row)row.style.transition='';},200);}}
   }
   function closeConfirmModal(){
     document.getElementById('confirm-modal').classList.add('hidden');
@@ -379,9 +449,10 @@
   async function deleteShot(id){
     const{error}=await db.from('shots').delete().eq('id',id);
     if(error){console.error(error);showToast('Could not delete — try again');return;}
-    showToast('Shot deleted');loadHistory();loadLastExtraction();
+    showToast('Shot deleted');loadHistory();loadLastExtraction();refreshInventory();
   }
 
+  // ── Dial with confirm-after-idle ─────────────────────────
   let grindSetting=18.5,isDragging=false,lastAngle=0,grindConfirmTimer=null,grindPendingValue=null;
   const MIN_GRIND=1,MAX_GRIND=30,DEGREES_PER_UNIT=300/(MAX_GRIND-MIN_GRIND);
   function grindToAngle(g){return(g-MIN_GRIND)*DEGREES_PER_UNIT-150;}
@@ -391,25 +462,30 @@
     return Math.atan2(clientY-cy,clientX-cx)*180/Math.PI+90;
   }
   function updateDial(g,save){
-    g=Math.max(MIN_GRIND,Math.min(MAX_GRIND,Math.round(g*2)/2));grindSetting=g;
-    document.getElementById('grind-input').value=g;
+    // Allow .5 increments only
+    g=Math.max(MIN_GRIND,Math.min(MAX_GRIND,Math.round(g*2)/2));
+    grindSetting=g;
+    // Show one decimal place only if .5
+    document.getElementById('grind-input').value=(g%1===0)?g:g.toFixed(1);
     const angle=grindToAngle(g),r=112,rad=(angle-90)*Math.PI/180;
     const marker=document.getElementById('dial-marker');
-    marker.style.left=(50+(r/128)*50*Math.cos(rad))+'%';marker.style.top=(50+(r/128)*50*Math.sin(rad))+'%';
+    marker.style.left=(50+(r/128)*50*Math.cos(rad))+'%';
+    marker.style.top=(50+(r/128)*50*Math.sin(rad))+'%';
     marker.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
     drawTicks();if(save)localStorage.setItem('ritual_grind',g);
   }
   function scheduleGrindConfirm(g){
     grindPendingValue=g;clearTimeout(grindConfirmTimer);
     grindConfirmTimer=setTimeout(()=>{
-      document.getElementById('grind-confirm-value').textContent=g;
+      document.getElementById('grind-confirm-value').textContent=(g%1===0)?g:g.toFixed(1);
       document.getElementById('grind-confirm-modal').classList.remove('hidden');
     },1500);
   }
   function confirmGrindUpdate(){
     document.getElementById('grind-confirm-modal').classList.add('hidden');
     localStorage.setItem('ritual_grind',grindPendingValue);
-    showToast('Grind set to '+grindPendingValue);grindPendingValue=null;
+    showToast('Grind set to '+((grindPendingValue%1===0)?grindPendingValue:grindPendingValue.toFixed(1)));
+    grindPendingValue=null;
   }
   function cancelGrindUpdate(){
     document.getElementById('grind-confirm-modal').classList.add('hidden');
@@ -435,13 +511,38 @@
   dialEl.addEventListener('touchstart',e=>{if(e.target.id==='grind-input')return;isDragging=true;lastAngle=getPointerAngle(e,dialEl.getBoundingClientRect());},{passive:true});
   window.addEventListener('mousemove',e=>{if(!isDragging)return;const a=getPointerAngle(e,dialEl.getBoundingClientRect());let d=a-lastAngle;if(d>180)d-=360;if(d<-180)d+=360;lastAngle=a;const nv=Math.max(MIN_GRIND,Math.min(MAX_GRIND,Math.round((grindSetting+d/DEGREES_PER_UNIT)*2)/2));updateDial(nv,false);scheduleGrindConfirm(nv);});
   window.addEventListener('touchmove',e=>{if(!isDragging)return;const a=getPointerAngle(e,dialEl.getBoundingClientRect());let d=a-lastAngle;if(d>180)d-=360;if(d<-180)d+=360;lastAngle=a;const nv=Math.max(MIN_GRIND,Math.min(MAX_GRIND,Math.round((grindSetting+d/DEGREES_PER_UNIT)*2)/2));updateDial(nv,false);scheduleGrindConfirm(nv);},{passive:true});
-  window.addEventListener('mouseup',()=>{isDragging=false;});window.addEventListener('touchend',()=>{isDragging=false;});
+  window.addEventListener('mouseup',()=>{isDragging=false;});
+  window.addEventListener('touchend',()=>{isDragging=false;});
   function focusGrindInput(){document.getElementById('grind-input').select();}
-  function blurGrindInput(){let v=parseFloat(document.getElementById('grind-input').value);if(isNaN(v))v=grindSetting;updateDial(v,false);scheduleGrindConfirm(v);}
-  function onGrindInputChange(){let v=parseFloat(document.getElementById('grind-input').value);if(!isNaN(v)){updateDial(v,false);scheduleGrindConfirm(v);}}
-  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');setTimeout(()=>t.classList.add('hidden'),2700);}
+  function blurGrindInput(){
+    let v=parseFloat(document.getElementById('grind-input').value);
+    if(isNaN(v))v=grindSetting;
+    // Snap to nearest 0.5
+    v=Math.round(v*2)/2;
+    updateDial(v,false);scheduleGrindConfirm(v);
+  }
+  function onGrindInputChange(){
+    // Allow typing freely — only snap on blur
+    const raw=document.getElementById('grind-input').value;
+    const v=parseFloat(raw);
+    if(!isNaN(v)&&v>=MIN_GRIND&&v<=MAX_GRIND){
+      const snapped=Math.round(v*2)/2;
+      updateDial(snapped,false);
+    }
+  }
+
+  // ── Toast ─────────────────────────────────────────────────
+  function showToast(msg){
+    const t=document.getElementById('toast');t.textContent=msg;
+    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
+    setTimeout(()=>t.classList.add('hidden'),2700);
+  }
+
+  // ── Init ──────────────────────────────────────────────────
   updateDial(parseFloat(localStorage.getItem('ritual_grind'))||18.5,false);
-  loadBrewingBean();loadLastExtraction();loadHistory();
+  loadBrewingBean();
+  loadLastExtraction();
+  loadHistory();
 </script>
 </body>
 </html>
