@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode:"class",
@@ -32,41 +33,17 @@
 <style>
   .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
   body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
-  
-  .field-input {
-    width: 100%;
-    background-color: #1c1b1b !important;
-    border: 1px solid rgba(80,68,66,0.2) !important;
-    border-radius: 0.75rem !important; /* Updated to be rounded */
-    padding: 0.75rem 1rem;
-    color: #ffffff !important; /* Typed text is white */
-    font-family: 'Manrope', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 600;
-    outline: none;
-    transition: box-shadow 0.2s;
-  }
-  
-  .field-input:focus {
-    box-shadow: 0 0 0 1px rgba(241, 223, 211, 0.3) !important;
-  }
-  
-  .field-input::placeholder {
-    color: rgba(156, 141, 138, 0.4) !important; /* Pre-fill text is light grey */
-    font-weight: 400;
-  }
-  
-  select.field-input {
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-  }
-
+  .field-input{width:100%;background-color:#1c1b1b;border:1px solid rgba(80,68,66,0.2);border-radius:0.75rem;padding:0.75rem 1rem;color:#e5e2e1;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:500;outline:none;transition:box-shadow 0.2s;}
+  .field-input:focus{box-shadow:0 0 0 1px rgba(241,223,211,0.3);}
+  .field-input::placeholder{color:rgba(156,141,138,0.4);font-weight:400;}
+  select.field-input{appearance:none;-webkit-appearance:none;cursor:pointer;}
   .field-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#F1DFD3;margin-bottom:0.5rem;margin-left:0.25rem;}
   input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:#353534;border-radius:9999px;outline:none;cursor:pointer;}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:#F1DFD3;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
   input[type=range]::-moz-range-thumb{width:18px;height:18px;background:#F1DFD3;border-radius:50%;border:none;cursor:pointer;}
-  input[type=text].date-field{letter-spacing:0.05em;}
+  .descriptor-btn{transition:all 0.15s ease;}
+  @keyframes slide-up-fade{0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);}}
+  .toast-anim{animation:slide-up-fade 2.6s ease forwards;}
 </style>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-24">
@@ -85,11 +62,14 @@
   </div>
 
   <div class="space-y-8">
+
+    <!-- Bean Name -->
     <div>
       <label class="field-label">Bean Name</label>
       <input id="bean-name" class="field-input" type="text" placeholder="e.g. Ethiopia Yirgacheffe"/>
     </div>
 
+    <!-- Roaster & Region -->
     <div class="grid grid-cols-5 gap-4">
       <div class="col-span-3">
         <label class="field-label">Roaster</label>
@@ -97,10 +77,59 @@
       </div>
       <div class="col-span-2">
         <label class="field-label">Region</label>
-        <input id="region" class="field-input" type="text" placeholder="e.g. Yirgacheffe"/>
+        <select id="region" class="field-input pr-8">
+          <option value="">Select...</option>
+          <option>Unknown</option>
+          <optgroup label="Africa">
+            <option>Ethiopia — Yirgacheffe</option>
+            <option>Ethiopia — Sidamo</option>
+            <option>Ethiopia — Guji</option>
+            <option>Ethiopia — Harrar</option>
+            <option>Kenya</option>
+            <option>Rwanda</option>
+            <option>Burundi</option>
+            <option>Tanzania</option>
+            <option>Uganda</option>
+            <option>Zimbabwe</option>
+          </optgroup>
+          <optgroup label="Central & South America">
+            <option>Colombia — Huila</option>
+            <option>Colombia — Nariño</option>
+            <option>Colombia — Antioquia</option>
+            <option>Guatemala — Antigua</option>
+            <option>Guatemala — Huehuetenango</option>
+            <option>Brazil — Cerrado</option>
+            <option>Brazil — Sul de Minas</option>
+            <option>Brazil — Mogiana</option>
+            <option>Costa Rica</option>
+            <option>Panama</option>
+            <option>Honduras</option>
+            <option>Peru</option>
+            <option>Bolivia</option>
+            <option>Ecuador</option>
+          </optgroup>
+          <optgroup label="Asia Pacific">
+            <option>Indonesia — Sumatra</option>
+            <option>Indonesia — Sulawesi</option>
+            <option>Indonesia — Java</option>
+            <option>Papua New Guinea</option>
+            <option>Yemen</option>
+            <option>India — Monsoon Malabar</option>
+            <option>Vietnam</option>
+            <option>Myanmar</option>
+          </optgroup>
+          <option value="custom">Other (type below)</option>
+        </select>
       </div>
     </div>
 
+    <!-- Custom region input (shown when Other selected) -->
+    <div id="region-custom-wrap" class="hidden">
+      <label class="field-label">Region (custom)</label>
+      <input id="region-custom" class="field-input" type="text" placeholder="Type region..."/>
+    </div>
+
+    <!-- Process -->
     <div>
       <label class="field-label">Process</label>
       <div class="relative">
@@ -116,11 +145,13 @@
           <option>Pulped Natural</option>
           <option>Double Fermentation</option>
           <option>Experimental</option>
+          <option>Other</option>
         </select>
         <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary/60 text-xl">expand_more</span>
       </div>
     </div>
 
+    <!-- Roast Level -->
     <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
       <div class="flex justify-between items-end mb-5">
         <label class="field-label mb-0">Roast Level</label>
@@ -134,21 +165,53 @@
       </div>
     </div>
 
+    <!-- Bag Weight -->
     <div>
       <label class="field-label">Bag Weight (g)</label>
       <input id="bag-weight" class="field-input" type="number" placeholder="250"/>
     </div>
 
+    <!-- Roast Date -->
     <div>
       <label class="field-label">Roast Date</label>
-      <input id="roast-date" class="field-input date-field" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
+      <input id="roast-date" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
     </div>
 
+    <!-- Date Opened -->
     <div>
       <label class="field-label">Date Opened</label>
-      <input id="date-opened" class="field-input date-field" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
+      <input id="date-opened" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
     </div>
 
+    <!-- Tasting Descriptors -->
+    <div class="space-y-3">
+      <label class="field-label">Expected Tasting Notes</label>
+      <p class="text-[10px] text-outline font-medium -mt-1 ml-1">Select all that apply — or add your own</p>
+      <div class="flex flex-wrap gap-2" id="descriptor-tags">
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Floral</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Fruity</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Citrus</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Berry</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Chocolate</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Caramel</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Nutty</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Spice</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Earthy</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Smoky</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Sweet</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Bright</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Syrupy</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Winey</button>
+        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Jasmine</button>
+      </div>
+      <!-- Add custom descriptor -->
+      <div class="flex gap-2 mt-2">
+        <input id="custom-descriptor" class="field-input flex-1 py-2 text-sm" type="text" placeholder="Add your own..."/>
+        <button type="button" onclick="addCustomDescriptor()" class="px-4 py-2 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary hover:bg-primary hover:text-on-primary transition-all">Add</button>
+      </div>
+    </div>
+
+    <!-- Buttons -->
     <div class="pt-4 flex flex-col gap-3">
       <button onclick="saveBean()" class="w-full py-4 bg-primary text-on-primary font-extrabold rounded-xl uppercase tracking-widest text-xs shadow-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
         Save Changes
@@ -157,8 +220,11 @@
         Discard
       </a>
     </div>
+
   </div>
 </main>
+
+<div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
 
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
   <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
@@ -173,58 +239,159 @@
 </nav>
 
 <script>
-  const ROAST_LABELS = ['Light','Medium-Light','Medium','Medium-Dark','Dark'];
-  function updateRoastLabel(v){ document.getElementById('roast-label').textContent = ROAST_LABELS[parseInt(v)-1]; }
+  const SUPABASE_URL='https://pblsuaypnzvbdjbnqghv.supabase.co';
+  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+  const ROAST_LABELS=['Light','Medium-Light','Medium','Medium-Dark','Dark'];
+
+  function updateRoastLabel(v){
+    document.getElementById('roast-label').textContent=ROAST_LABELS[parseInt(v)-1];
+  }
+
+  // Auto-slash date
   function setupDateInput(id){
-    const el=document.getElementById(id);
-    el.addEventListener('input',function(e){
+    document.getElementById(id).addEventListener('input',function(){
       let v=this.value.replace(/\D/g,'');
-      if(v.length>2) v=v.substring(0,2)+'/'+v.substring(2);
-      if(v.length>5) v=v.substring(0,5)+'/'+v.substring(5);
-      if(v.length>10) v=v.substring(0,10);
+      if(v.length>2)v=v.substring(0,2)+'/'+v.substring(2);
+      if(v.length>5)v=v.substring(0,5)+'/'+v.substring(5);
+      if(v.length>10)v=v.substring(0,10);
       this.value=v;
     });
   }
-  setupDateInput('roast-date');setupDateInput('date-opened');
+  setupDateInput('roast-date');
+  setupDateInput('date-opened');
 
-  function loadBean(){
-    const bean=JSON.parse(localStorage.getItem('ritual_current_bean')||'null');
-    if(!bean) return;
-    if(bean.name) document.getElementById('bean-name').value=bean.name;
-    if(bean.roaster) document.getElementById('roaster').value=bean.roaster;
-    if(bean.region) document.getElementById('region').value=bean.region;
-    if(bean.process){
-      const sel=document.getElementById('process');
-      for(let i=0;i<sel.options.length;i++){
-        if(sel.options[i].value===bean.process||sel.options[i].text===bean.process){sel.selectedIndex=i;break;}
-      }
-    }
-    if(bean.roast_level){
-      const idx=ROAST_LABELS.indexOf(bean.roast_level);
-      if(idx>=0){document.getElementById('roast-slider').value=idx+1;updateRoastLabel(idx+1);}
-    }
-    if(bean.bag_weight) document.getElementById('bag-weight').value=bean.bag_weight;
-    if(bean.roast_date) document.getElementById('roast-date').value=bean.roast_date;
-    if(bean.date_opened) document.getElementById('date-opened').value=bean.date_opened;
+  // Region custom toggle
+  document.getElementById('region').addEventListener('change',function(){
+    document.getElementById('region-custom-wrap').classList.toggle('hidden',this.value!=='custom');
+  });
+
+  // Descriptors
+  function toggleDescriptor(btn){
+    const active=btn.getAttribute('data-active')==='1';
+    if(active){btn.style.backgroundColor='';btn.style.color='#F1DFD3';btn.removeAttribute('data-active');}
+    else{btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');}
   }
 
-  function saveBean(){
+  function addCustomDescriptor(){
+    const input=document.getElementById('custom-descriptor');
+    const val=input.value.trim();
+    if(!val)return;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='descriptor-btn px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-extrabold';
+    btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
+    btn.setAttribute('data-active','1');
+    btn.setAttribute('data-custom','1');
+    btn.textContent=val;
+    btn.onclick=function(){toggleDescriptor(this);};
+    document.getElementById('descriptor-tags').appendChild(btn);
+    input.value='';
+  }
+
+  // Allow Enter key to add descriptor
+  document.getElementById('custom-descriptor').addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();addCustomDescriptor();}
+  });
+
+  function getSelectedDescriptors(){
+    const out=[];
+    document.querySelectorAll('#descriptor-tags [data-active="1"]').forEach(b=>out.push(b.textContent.trim()));
+    return out;
+  }
+
+  // Load existing bean from Supabase
+  async function loadBean(){
+    const{data,error}=await db.from('current_bean').select('*').eq('id',1).single();
+    if(error||!data)return;
+    if(data.name)document.getElementById('bean-name').value=data.name;
+    if(data.roaster)document.getElementById('roaster').value=data.roaster;
+    if(data.region){
+      const sel=document.getElementById('region');
+      let found=false;
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].value===data.region||sel.options[i].text===data.region){sel.selectedIndex=i;found=true;break;}
+      }
+      if(!found){
+        sel.value='custom';
+        document.getElementById('region-custom-wrap').classList.remove('hidden');
+        document.getElementById('region-custom').value=data.region;
+      }
+    }
+    if(data.process){
+      const sel=document.getElementById('process');
+      for(let i=0;i<sel.options.length;i++){
+        if(sel.options[i].text===data.process){sel.selectedIndex=i;break;}
+      }
+    }
+    if(data.roast_level){
+      const idx=ROAST_LABELS.indexOf(data.roast_level);
+      if(idx>=0){document.getElementById('roast-slider').value=idx+1;updateRoastLabel(idx+1);}
+    }
+    if(data.bag_weight)document.getElementById('bag-weight').value=data.bag_weight;
+    if(data.roast_date)document.getElementById('roast-date').value=data.roast_date;
+    if(data.date_opened)document.getElementById('date-opened').value=data.date_opened;
+
+    // Restore descriptors
+    if(data.descriptors&&Array.isArray(data.descriptors)){
+      const existing=document.querySelectorAll('#descriptor-tags button');
+      existing.forEach(btn=>{
+        if(data.descriptors.includes(btn.textContent.trim())){
+          btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');
+        }
+      });
+      // Add any custom ones not in the preset list
+      const presetLabels=Array.from(existing).map(b=>b.textContent.trim());
+      data.descriptors.forEach(d=>{
+        if(!presetLabels.includes(d)){
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='descriptor-btn px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-extrabold';
+          btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
+          btn.setAttribute('data-active','1');btn.setAttribute('data-custom','1');
+          btn.textContent=d;btn.onclick=function(){toggleDescriptor(this);};
+          document.getElementById('descriptor-tags').appendChild(btn);
+        }
+      });
+    }
+  }
+
+  async function saveBean(){
     const name=document.getElementById('bean-name').value.trim();
-    if(!name){alert('Please enter a bean name.');return;}
+    if(!name){showToast('Please enter a bean name');return;}
     const roastIdx=parseInt(document.getElementById('roast-slider').value);
+
+    // Region — use custom if selected
+    let region=document.getElementById('region').value;
+    if(region==='custom')region=document.getElementById('region-custom').value.trim()||null;
+    if(region==='')region=null;
+
     const bean={
       name,
       roaster:document.getElementById('roaster').value.trim()||null,
-      region:document.getElementById('region').value.trim()||null,
+      region,
       process:document.getElementById('process').value||null,
       roast_level:ROAST_LABELS[roastIdx-1],
       bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
       roast_date:document.getElementById('roast-date').value||null,
       date_opened:document.getElementById('date-opened').value||null,
+      descriptors:getSelectedDescriptors(),
+      updated_at:new Date().toISOString(),
     };
-    localStorage.setItem('ritual_current_bean',JSON.stringify(bean));
-    window.location.href='index.html';
+
+    const{error}=await db.from('current_bean').upsert({id:1,...bean});
+    if(error){console.error(error);showToast('Error saving — try again');return;}
+    showToast('Saved ✓');
+    setTimeout(()=>window.location.href='index.html',800);
   }
+
+  function showToast(msg){
+    const t=document.getElementById('toast');t.textContent=msg;
+    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
+    setTimeout(()=>t.classList.add('hidden'),2700);
+  }
+
   loadBean();
 </script>
 </body>
