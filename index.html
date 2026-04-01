@@ -121,7 +121,7 @@
         <h3 id="brew-name" class="text-2xl font-extrabold text-on-surface tracking-tight">—</h3>
       </div>
       <!-- Edit icon — slightly smaller -->
-      <a href="edit-bean.html" class="w-8 h-8 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
+      <a href="select-coffee.html" class="w-8 h-8 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
         <span class="material-symbols-outlined text-primary" style="font-size:16px;">edit</span>
       </a>
     </div>
@@ -151,7 +151,7 @@
       <svg class="absolute inset-0 w-full h-full" viewBox="0 0 256 256"><g id="tick-marks"></g></svg>
       <!-- Grind setting label pushed further toward centre -->
       <div class="text-center z-10 bg-surface-container rounded-full w-48 h-48 flex flex-col items-center justify-center shadow-2xl border border-outline-variant/10">
-        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-2 mt-4">Grind Setting</span>
+        <span class="text-primary font-bold text-[10px] uppercase tracking-[0.2em] mb-1">Grind Setting</span>
         <input id="grind-input" type="number" min="1" max="30" step="0.5" value="18.5"
           onclick="focusGrindInput()" onblur="blurGrindInput()" oninput="onGrindInputChange()"/>
       </div>
@@ -242,14 +242,17 @@
   </div>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-6 py-2 transition-transform active:scale-95" href="#">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
+  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-4 py-2 transition-transform active:scale-95" href="#">
     <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
   </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">History</span>
+  </a>
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 transition-all" href="#">
     <span class="text-[10px] uppercase tracking-widest font-extrabold">Inventory</span>
   </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
     <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
   </a>
 </nav>
