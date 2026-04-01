@@ -101,13 +101,13 @@
 
 <main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
   <div class="mb-8">
-    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">currently brewing</h2>
+    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">add new coffee</h2>
   </div>
 
   <div class="space-y-8">
 
     <div>
-      <label class="field-label">Bean Name</label>
+      <label class="field-label">Name of Coffee</label>
       <input id="bean-name" class="field-input" type="text" placeholder="e.g. Ethiopia Yirgacheffe"/>
     </div>
 
@@ -329,59 +329,27 @@
     return out;
   }
 
-  async function loadBean(){
-    const{data,error}=await db.from('current_bean').select('*').eq('id',1).single();
-    if(error||!data)return;
-    if(data.name)document.getElementById('bean-name').value=data.name;
-    if(data.roaster)document.getElementById('roaster').value=data.roaster;
-    if(data.region){
-      const sel=document.getElementById('region');let found=false;
-      for(let i=0;i<sel.options.length;i++){
-        if(sel.options[i].value===data.region||sel.options[i].text===data.region){sel.selectedIndex=i;found=true;break;}
-      }
-      if(!found){sel.value='custom';document.getElementById('region-custom-wrap').classList.remove('hidden');document.getElementById('region-custom').value=data.region;}
-    }
-    if(data.process){
-      const sel=document.getElementById('process');
-      for(let i=0;i<sel.options.length;i++){if(sel.options[i].text===data.process){sel.selectedIndex=i;break;}}
-    }
-    if(data.roast_level){const idx=ROAST_LABELS.indexOf(data.roast_level);if(idx>=0){document.getElementById('roast-slider').value=idx+1;updateRoastLabel(idx+1);}}
-    if(data.bag_weight)document.getElementById('bag-weight').value=data.bag_weight;
-    if(data.roast_date)document.getElementById('roast-date').value=data.roast_date;
-    if(data.date_opened)document.getElementById('date-opened').value=data.date_opened;
-    if(data.descriptors&&Array.isArray(data.descriptors)){
-      const existing=document.querySelectorAll('#descriptor-tags button');
-      existing.forEach(btn=>{if(data.descriptors.includes(btn.textContent.trim())){btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');}});
-      const presetLabels=Array.from(existing).map(b=>b.textContent.trim());
-      data.descriptors.forEach(d=>{
-        if(!presetLabels.includes(d)){
-          const btn=document.createElement('button');btn.type='button';
-          btn.className='descriptor-btn px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-extrabold';
-          btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
-          btn.setAttribute('data-active','1');btn.setAttribute('data-custom','1');
-          btn.textContent=d;btn.onclick=function(){toggleDescriptor(this);};
-          document.getElementById('descriptor-tags').appendChild(btn);
-        }
-      });
-    }
-  }
-
   async function saveBean(){
     const name=document.getElementById('bean-name').value.trim();
-    if(!name){showToast('Please enter a bean name');return;}
+    if(!name){showToast('Please enter a coffee name');return;}
     const roastIdx=parseInt(document.getElementById('roast-slider').value);
     let region=document.getElementById('region').value;
     if(region==='custom')region=document.getElementById('region-custom').value.trim()||null;
     if(region==='')region=null;
-    const bean={name,roaster:document.getElementById('roaster').value.trim()||null,region,
-      process:document.getElementById('process').value||null,roast_level:ROAST_LABELS[roastIdx-1],
+    const bean={
+      name,
+      roaster:document.getElementById('roaster').value.trim()||null,
+      region,
+      process:document.getElementById('process').value||null,
+      roast_level:ROAST_LABELS[roastIdx-1],
       bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
       roast_date:document.getElementById('roast-date').value||null,
       date_opened:document.getElementById('date-opened').value||null,
-      descriptors:getSelectedDescriptors(),updated_at:new Date().toISOString()};
-    const{error}=await db.from('current_bean').upsert({id:1,...bean});
+      notes:JSON.stringify(getSelectedDescriptors()),
+    };
+    const{error}=await db.from('beans').insert([bean]);
     if(error){console.error(error);showToast('Error saving — try again');return;}
-    showToast('Saved ✓');
+    showToast('Coffee added ✓');
     setTimeout(()=>window.location.href='index.html',800);
   }
 
@@ -391,7 +359,6 @@
     setTimeout(()=>t.classList.add('hidden'),2700);
   }
 
-  loadBean();
 </script>
 </body>
 </html>
