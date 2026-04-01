@@ -68,6 +68,7 @@
     <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">shot history</h2>
   </div>
 
+  <!-- Search -->
   <div class="mb-8 relative">
     <div class="flex items-center bg-surface-container-low px-5 py-3 rounded-xl border border-outline-variant/10 focus-within:ring-1 ring-primary/30 transition-all">
       <span class="material-symbols-outlined text-primary/60 mr-3 text-xl">search</span>
@@ -82,14 +83,17 @@
   <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
     <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
   </a>
-  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-6 py-2 transition-transform active:scale-95" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Journal</span>
+  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-4 py-2 transition-transform active:scale-95" href="#">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">History</span>
   </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-6 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 transition-all" href="#">
+    <span class="text-[10px] uppercase tracking-widest font-extrabold">Inventory</span>
+  </a>
+  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
     <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
   </a>
 </nav>
@@ -102,8 +106,10 @@
   let allShots=[];
   let pendingDeleteId=null;
 
-  // NEUTRAL STYLE FOR BREWER AND SYSTEM TAGS
-  const NEUTRAL_TAG = 'color:#e5e2e1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)';
+  const BREWER_COLORS={
+    'Caro':'color:#F0BD8B;background:rgba(240,189,139,0.12);border:1px solid rgba(240,189,139,0.25)',
+    'Ross':'color:#F1DFD3;background:rgba(241,223,211,0.08);border:1px solid rgba(241,223,211,0.2)',
+  };
 
   function ratingChipStyle(r){
     const m={
@@ -128,13 +134,11 @@
       const date=dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
       const time=dt.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:true});
 
+      // Tags row
       const tags=[];
-      // BREWER IS NOW NEUTRAL
-      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">${shot.brewer}</span>`);
-      // UPDATED LABELS FOR SPEED AND SETTING
-      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">Grind Speed: ${shot.grind_speed}</span>`);
-      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${NEUTRAL_TAG}">Grind Setting: ${shot.grind_setting}</span>`);
-      
+      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${BREWER_COLORS[shot.brewer]||BREWER_COLORS['Ross']}">${shot.brewer}</span>`);
+      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Speed: ${shot.grind_speed}</span>`);
+      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Grind ${shot.grind_setting}</span>`);
       if(shot.rating&&shot.rating!=='Unrated'){
         shot.rating.split(',').forEach(r=>{
           const rt=r.trim();
