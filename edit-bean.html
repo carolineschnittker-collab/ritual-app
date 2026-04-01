@@ -247,7 +247,26 @@
       </div>
     </div>
 
-    <div class="pt-4 flex flex-col gap-3">
+    <!-- Phase selector -->
+    <div class="space-y-3">
+      <label class="field-label">Status</label>
+      <div class="flex gap-2">
+        <button type="button" onclick="selectPhase(this,'resting')" data-phase="resting"
+          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
+          Resting
+        </button>
+        <button type="button" onclick="selectPhase(this,'ready')" data-phase="ready"
+          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
+          Ready
+        </button>
+        <button type="button" onclick="selectPhase(this,'freezer')" data-phase="freezer"
+          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
+          Freezer
+        </button>
+      </div>
+    </div>
+
+    <div class="pt-2 flex flex-col gap-3">
       <button onclick="saveBean()" class="w-full py-4 bg-primary text-on-primary font-extrabold rounded-xl uppercase tracking-widest text-xs shadow-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
         Save Changes
       </button>
@@ -329,6 +348,16 @@
     return out;
   }
 
+  // Phase selection
+  let selectedPhase = null;
+  function selectPhase(btn, phase){
+    document.querySelectorAll('.phase-btn').forEach(b=>{
+      b.style.backgroundColor='';b.style.color='#F1DFD3';
+    });
+    btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
+    selectedPhase=phase;
+  }
+
   async function saveBean(){
     const name=document.getElementById('bean-name').value.trim();
     if(!name){showToast('Please enter a coffee name');return;}
@@ -346,6 +375,7 @@
       roast_date:document.getElementById('roast-date').value||null,
       date_opened:document.getElementById('date-opened').value||null,
       notes:JSON.stringify(getSelectedDescriptors()),
+      phase:selectedPhase||null,
     };
     const{error}=await db.from('beans').insert([bean]);
     if(error){console.error(error);showToast('Error saving — try again');return;}
