@@ -123,10 +123,7 @@
             <option value="">Select...</option>
             <option>Unknown</option>
             <optgroup label="Africa">
-              <option>Ethiopia — Yirgacheffe</option>
-              <option>Ethiopia — Sidamo</option>
-              <option>Ethiopia — Guji</option>
-              <option>Ethiopia — Harrar</option>
+              <option>Ethiopia</option>
               <option>Kenya</option>
               <option>Rwanda</option>
               <option>Burundi</option>
@@ -135,14 +132,9 @@
               <option>Zimbabwe</option>
             </optgroup>
             <optgroup label="Central & South America">
-              <option>Colombia — Huila</option>
-              <option>Colombia — Nariño</option>
-              <option>Colombia — Antioquia</option>
-              <option>Guatemala — Antigua</option>
-              <option>Guatemala — Huehuetenango</option>
-              <option>Brazil — Cerrado</option>
-              <option>Brazil — Sul de Minas</option>
-              <option>Brazil — Mogiana</option>
+              <option>Colombia</option>
+              <option>Guatemala</option>
+              <option>Brazil</option>
               <option>Costa Rica</option>
               <option>Panama</option>
               <option>Honduras</option>
@@ -151,12 +143,10 @@
               <option>Ecuador</option>
             </optgroup>
             <optgroup label="Asia Pacific">
-              <option>Indonesia — Sumatra</option>
-              <option>Indonesia — Sulawesi</option>
-              <option>Indonesia — Java</option>
+              <option>Indonesia</option>
               <option>Papua New Guinea</option>
               <option>Yemen</option>
-              <option>India — Monsoon Malabar</option>
+              <option>India</option>
               <option>Vietnam</option>
               <option>Myanmar</option>
             </optgroup>
@@ -177,13 +167,13 @@
       <div class="relative">
         <select id="process" class="field-input pr-10">
           <option value="">Select process...</option>
-          <option>Washed (Wet)</option>
-          <option>Natural (Dry)</option>
+          <option>Washed</option>
+          <option>Natural</option>
           <option>Honey</option>
           <option>Anaerobic Natural</option>
           <option>Anaerobic Washed</option>
           <option>Carbonic Maceration</option>
-          <option>Wet-Hulled (Giling Basah)</option>
+          <option>Wet-Hulled</option>
           <option>Pulped Natural</option>
           <option>Double Fermentation</option>
           <option>Experimental</option>
@@ -212,12 +202,12 @@
     </div>
 
     <div>
-      <label class="field-label">Roast Date</label>
+      <label class="field-label">Roast Date <span class="text-error normal-case tracking-normal font-bold">*</span></label>
       <input id="roast-date" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
     </div>
 
     <div>
-      <label class="field-label">Date Opened</label>
+      <label class="field-label">Date Opened <span class="text-outline normal-case tracking-normal font-normal">(optional)</span></label>
       <input id="date-opened" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
     </div>
 
@@ -361,10 +351,15 @@
   async function saveBean(){
     const name=document.getElementById('bean-name').value.trim();
     if(!name){showToast('Please enter a coffee name');return;}
+
+    const roastDate=document.getElementById('roast-date').value.trim();
+    if(!roastDate){showToast('Roast date is required');return;}
+
     const roastIdx=parseInt(document.getElementById('roast-slider').value);
     let region=document.getElementById('region').value;
     if(region==='custom')region=document.getElementById('region-custom').value.trim()||null;
     if(region==='')region=null;
+
     const bean={
       name,
       roaster:document.getElementById('roaster').value.trim()||null,
@@ -372,13 +367,18 @@
       process:document.getElementById('process').value||null,
       roast_level:ROAST_LABELS[roastIdx-1],
       bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
-      roast_date:document.getElementById('roast-date').value||null,
-      date_opened:document.getElementById('date-opened').value||null,
-      notes:JSON.stringify(getSelectedDescriptors()),
+      roast_date:roastDate,
+      date_opened:document.getElementById('date-opened').value.trim()||null,
+      descriptors:getSelectedDescriptors(),
       phase:selectedPhase||null,
     };
+
     const{error}=await db.from('beans').insert([bean]);
-    if(error){console.error(error);showToast('Error saving — try again');return;}
+    if(error){
+      console.error('Supabase error:', error.message, error.details, error.hint);
+      showToast('Error: '+error.message);
+      return;
+    }
     showToast('Coffee added ✓');
     setTimeout(()=>window.location.href='index.html',800);
   }
