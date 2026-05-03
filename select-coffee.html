@@ -62,11 +62,11 @@
     <p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Loading...</p>
   </div>
 
-  <!-- Empty state add button -->
-  <div id="empty-add" class="hidden pt-6">
+  <!-- Always visible add button -->
+  <div class="pt-4">
     <a href="edit-bean.html" class="w-full border border-primary/30 text-primary py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">
       <span class="material-symbols-outlined text-sm">add_circle</span>
-      Add your first coffee
+      Add New Coffee
     </a>
   </div>
 </main>
@@ -104,8 +104,7 @@
     }
 
     if(!beans||beans.length===0){
-      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">No coffees in your inventory yet</p>';
-      document.getElementById('empty-add').classList.remove('hidden');
+      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">No coffees yet — add one below</p>';
       return;
     }
 
