@@ -113,33 +113,21 @@
 
 <main class="px-6 max-w-2xl mx-auto space-y-12 pt-24">
 
-  <!-- Currently Brewing -->
-  <section class="bg-surface-container-low rounded-xl p-6 space-y-5 relative overflow-hidden border border-outline-variant/5">
-    <div class="flex justify-between items-start">
-      <div class="space-y-1">
-        <p class="text-[10px] uppercase tracking-widest text-primary font-bold">Currently Brewing</p>
-        <h3 id="brew-name" class="text-2xl font-extrabold text-on-surface tracking-tight">—</h3>
+  <!-- Currently Brewing — compact single row -->
+  <section class="bg-surface-container-low rounded-xl px-5 py-3.5 border border-outline-variant/5">
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-[9px] uppercase tracking-widest text-primary font-bold leading-none mb-1">Currently Brewing</p>
+        <h3 id="brew-name" class="text-base font-extrabold text-on-surface tracking-tight truncate">—</h3>
       </div>
-      <!-- Edit icon — slightly smaller -->
-      <a href="select-coffee.html" class="w-8 h-8 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors">
-        <span class="material-symbols-outlined text-primary" style="font-size:16px;">edit</span>
-      </a>
-    </div>
-    <div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
-      <div class="space-y-1">
-        <div class="flex items-center gap-1.5 opacity-60">
-          <span class="material-symbols-outlined text-sm">history</span>
-          <p class="text-[10px] uppercase tracking-widest font-bold">last extraction</p>
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <div class="text-right">
+          <p id="shots-left" class="text-lg font-extrabold text-on-surface leading-none">—</p>
+          <p class="text-[9px] text-outline font-bold uppercase tracking-widest leading-none mt-0.5">shots left</p>
         </div>
-        <div class="flex items-baseline gap-1">
-          <span id="last-extraction-time" class="text-3xl font-extrabold text-primary">--</span>
-          <span id="last-extraction-unit" class="text-base font-bold text-primary opacity-60"></span>
-        </div>
-        <span id="last-extraction-brewer" class="text-[9px] uppercase tracking-widest text-outline font-bold opacity-70"></span>
-      </div>
-      <div class="text-right space-y-1">
-        <p id="shots-left" class="text-3xl font-extrabold text-on-surface">—</p>
-        <p class="text-[9px] text-outline font-bold uppercase tracking-widest">shots left</p>
+        <a href="select-coffee.html" class="w-8 h-8 flex items-center justify-center bg-surface-container-high rounded-full hover:bg-primary/20 transition-colors flex-shrink-0">
+          <span class="material-symbols-outlined text-primary" style="font-size:16px;">edit</span>
+        </a>
       </div>
     </div>
   </section>
@@ -188,11 +176,11 @@
     <div class="flex gap-4">
       <div class="flex-1 space-y-2">
         <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Dose In (g)</p>
-        <input id="dose-in" type="number" step="0.1" placeholder="18.0" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
+        <input id="dose-in" type="number" step="0.1" value="20" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
       </div>
       <div class="flex-1 space-y-2">
         <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Yield Out (g)</p>
-        <input id="yield-out" type="number" step="0.1" placeholder="36.0" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
+        <input id="yield-out" type="number" step="0.1" value="40" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
       </div>
     </div>
 
@@ -409,8 +397,8 @@
     updateLastExtractionDisplay(seconds,brewer);showToast('Shot saved ✓');
     resetTimer();clearTags('rating');clearTags('grind-speed');
     document.getElementById('shot-notes').value='';
-    document.getElementById('dose-in').value='';
-    document.getElementById('yield-out').value='';
+    document.getElementById('dose-in').value='20';
+    document.getElementById('yield-out').value='40';
     document.getElementById('manual-time').value='';
     document.getElementById('shot-rpm').value='1200';
     loadHistory();refreshInventory();
