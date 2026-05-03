@@ -169,8 +169,20 @@
     <div id="toast" class="hidden mt-4 px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center"></div>
   </section>
 
-  <!-- Log Shot section — Grind Speed + Dose/Yield FIRST, then Rate Shot, then Notes -->
+  <!-- Log Shot section -->
   <section class="space-y-6">
+
+    <!-- Manual time entry — shown when timer not used -->
+    <div class="flex gap-4">
+      <div class="flex-1 space-y-2">
+        <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Shot Time (s)</p>
+        <input id="manual-time" type="number" step="1" placeholder="e.g. 28" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
+      </div>
+      <div class="flex-1 space-y-2">
+        <p class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">RPM</p>
+        <input id="shot-rpm" type="number" step="1" value="1200" class="w-full bg-surface-container-low border border-outline-variant/10 rounded-xl px-4 py-3 text-sm font-medium text-on-surface placeholder:text-outline/40 focus:ring-1 focus:ring-primary/40 outline-none"/>
+      </div>
+    </div>
 
     <!-- Dose in / out -->
     <div class="flex gap-4">
@@ -316,12 +328,14 @@
     btn.textContent='Start';btn.style.backgroundColor='';btn.style.color='';
     document.getElementById('timer-display').classList.remove('timer-running');
     pendingDuration=Math.round(elapsedMs/1000);
+    document.getElementById('manual-time').value=pendingDuration;
     showToast('Shot stopped at '+pendingDuration+'s — rate & save below');
   }
   function resetTimer(){
     timerRunning=false;clearInterval(timerInterval);elapsedMs=0;pendingDuration=0;
     document.getElementById('timer-display').textContent='00:00.0';
     document.getElementById('timer-display').classList.remove('timer-running');
+    document.getElementById('manual-time').value='';
     const btn=document.getElementById('start-stop-btn');btn.textContent='Start';btn.style.backgroundColor='';btn.style.color='';
   }
   function updateDisplay(){
@@ -363,20 +377,32 @@
   function closeBrewerModal(){document.getElementById('brewer-modal').classList.add('hidden');}
   async function confirmSaveShot(brewer){
     closeBrewerModal();
-    const seconds=pendingDuration||Math.round(elapsedMs/1000);
+    // Timer takes priority; fall back to manual time entry
+    let seconds=pendingDuration||Math.round(elapsedMs/1000);
+    if(!seconds){
+      const manual=parseInt(document.getElementById('manual-time').value);
+      if(manual&&manual>0) seconds=manual;
+    }
+    if(!seconds){showToast('Add a shot time first');return;}
+
     const grind=parseFloat(document.getElementById('grind-input').value)||grindSetting;
     const beanName=document.getElementById('brew-name').textContent||'Unknown';
     const rawTags=getSelectedTags('rating');
     const summaryLabel=deriveSummaryLabel(rawTags);
+    const rpm=parseInt(document.getElementById('shot-rpm').value)||1200;
+
     const shot={
-      bean_name:beanName,grind_setting:grind,duration:seconds,
-      // Store both: raw descriptors as comma list, and the summary label
+      bean_name:beanName,
+      grind_setting:grind,
+      duration:seconds,
       rating:rawTags.length>0?rawTags.join(', '):'Unrated',
       summary_label:summaryLabel,
       notes:document.getElementById('shot-notes').value||null,
-      brewer,grind_speed:getSelectedTags('grind-speed')[0]||null,
+      brewer,
+      grind_speed:getSelectedTags('grind-speed')[0]||null,
       dose_in:parseFloat(document.getElementById('dose-in').value)||null,
-      yield_out:parseFloat(document.getElementById('yield-out').value)||null
+      yield_out:parseFloat(document.getElementById('yield-out').value)||null,
+      rpm,
     };
     const{error}=await db.from('shots').insert([shot]).select();
     if(error){console.error(error);showToast('Error saving — try again');return;}
@@ -385,6 +411,8 @@
     document.getElementById('shot-notes').value='';
     document.getElementById('dose-in').value='';
     document.getElementById('yield-out').value='';
+    document.getElementById('manual-time').value='';
+    document.getElementById('shot-rpm').value='1200';
     loadHistory();refreshInventory();
   }
 
