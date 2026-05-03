@@ -363,7 +363,7 @@
     const bean={
       name,
       roaster:document.getElementById('roaster').value.trim()||null,
-      region,
+      origin:region,
       process:document.getElementById('process').value||null,
       roast_level:ROAST_LABELS[roastIdx-1],
       bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
