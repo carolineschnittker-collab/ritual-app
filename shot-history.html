@@ -1,232 +1,386 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ritual — shot history</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ritual — history</title>
+<link rel="stylesheet" href="ritual-shared.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode:"class",
-    theme:{
-      extend:{
-        colors:{
-          "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
-          "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
-          "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
-          "surface-container":"#201f1f","outline":"#9c8d8a","on-surface":"#e5e2e1",
-          "secondary-container":"#5b403c","on-background":"#e5e2e1","inverse-surface":"#e5e2e1",
-          "on-secondary-container":"#d1ada7","inverse-on-surface":"#313030","on-primary-container":"#3e2c26",
-          "on-surface-variant":"#d4c3bf","surface-container-lowest":"#0e0e0e",
-          "surface-container-highest":"#353534","surface-container-low":"#1c1b1b",
-          "tertiary":"#cfc4c0","error":"#ffb4ab","surface-bright":"#393939","on-tertiary":"#352f2d"
-        },
-        fontFamily:{"headline":["Manrope"],"body":["Manrope"],"label":["Manrope"]},
-        borderRadius:{"DEFAULT":"0.5rem","lg":"0.75rem","xl":"1.5rem","full":"9999px"},
-      },
-    },
-  }
-</script>
 <style>
-  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-  body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
-  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#131313;}::-webkit-scrollbar-thumb{background:#353534;border-radius:10px;}
-  @keyframes slide-up-fade{0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);}}
-  .toast-anim{animation:slide-up-fade 2.6s ease forwards;}
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:flex-end;justify-content:center;}
-  .modal-sheet{background:#1c1b1b;border-radius:1.5rem 1.5rem 0 0;padding:2rem;width:100%;max-width:480px;border:1px solid rgba(80,68,66,0.3);}
+.search-wrap {
+  position: sticky;
+  top: 64px;
+  z-index: 50;
+  background: var(--surface);
+  padding: 10px 0 8px;
+  margin: 0 0 4px;
+}
+
+.search-input-wrap {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--on-surface-mid);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.search-input {
+  padding-left: 40px !important;
+}
+
+.shot-card {
+  background: var(--surface-low);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.shot-card.deleting {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.shot-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shot-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+
+.shot-card-sub {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-mid);
+  margin-top: 3px;
+}
+
+.shot-stats-row {
+  display: flex;
+  gap: 0;
+  background: var(--surface-mid);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stat-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  gap: 3px;
+  border-right: 1px solid rgba(255,255,255,0.04);
+}
+.stat-cell:last-child { border-right: none; }
+
+.stat-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--on-surface);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.stat-key {
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-surface-mid);
+}
+
+.shot-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.shot-tag-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.shot-tag-pill.t-brewer { background: var(--surface-high); color: var(--on-surface-mid); }
+.shot-tag-pill.t-grind { background: var(--surface-mid); color: var(--primary); }
+.shot-tag-pill.t-rating { }
+
+.shot-notes {
+  font-size: 0.8rem;
+  color: var(--on-surface-mid);
+  font-weight: 500;
+  line-height: 1.45;
+  font-style: italic;
+  border-left: 2px solid var(--outline);
+  padding-left: 10px;
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-surface-low);
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.delete-btn:hover { color: var(--error); background: rgba(255,180,171,0.08); }
+
+/* Filter chips */
+.filter-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--surface-high);
+  color: var(--on-surface-mid);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+.filter-chip.active { background: var(--primary); color: var(--on-primary); }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--on-surface-mid);
+}
+.empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+.empty-state p {
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+/* Rating badge colours */
+.rating-balanced { background: rgba(180,200,160,0.08); color: #8aaa74; border: 1px solid rgba(138,170,116,0.15); }
+.rating-under    { background: rgba(200,170,90,0.08);  color: #a8904e; border: 1px solid rgba(200,170,90,0.15);  }
+.rating-over     { background: rgba(200,100,90,0.08);  color: #a86058; border: 1px solid rgba(200,100,90,0.15);  }
 </style>
 </head>
-<body class="bg-surface text-on-surface min-h-screen pb-24">
+<body>
 
-<div id="confirm-modal" class="modal-overlay hidden">
-  <div class="modal-sheet space-y-6 text-center">
-    <div class="space-y-2">
-      <p class="text-[10px] uppercase tracking-[0.2em] text-error font-bold">Delete Shot?</p>
-      <p class="text-sm text-outline font-medium">This can't be undone.</p>
-    </div>
-    <div class="flex gap-3">
-      <button onclick="closeConfirmModal()" class="flex-1 bg-surface-container-high text-on-surface py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95">Cancel</button>
-      <button onclick="executeDelete()" class="flex-1 py-4 rounded-xl text-sm font-extrabold uppercase tracking-widest transition-all active:scale-95" style="background:#93000a;color:#ffdad6;">Delete</button>
-    </div>
-  </div>
-</div>
-
-<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
-  <div class="flex items-center justify-between w-full">
-    <a href="index.html" class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">arrow_back</span></a>
-    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
-    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">settings</span></button>
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="header-icon" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="wordmark">history</span>
+    <div class="header-icon" style="opacity:0;pointer-events:none;"></div>
   </div>
 </header>
 
-<main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
-  <div class="mb-8">
-    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">shot history</h2>
-  </div>
+<main class="page" style="gap:10px;">
 
-  <!-- Search -->
-  <div class="mb-8 relative">
-    <div class="flex items-center bg-surface-container-low px-5 py-3 rounded-xl border border-outline-variant/10 focus-within:ring-1 ring-primary/30 transition-all">
-      <span class="material-symbols-outlined text-primary/60 mr-3 text-xl">search</span>
-      <input id="search-input" class="bg-transparent border-none p-0 focus:ring-0 outline-none w-full text-on-surface placeholder:text-outline/40 text-sm font-medium" placeholder="Search by bean, brewer, notes..." type="text" oninput="filterShots()"/>
+  <div class="search-wrap">
+    <div class="search-input-wrap" style="margin-bottom:10px;">
+      <span class="search-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <input type="text" class="search-input" id="search" placeholder="search shots…">
+    </div>
+    <div class="filter-row" id="filter-row">
+      <button class="filter-chip active" data-filter="all">all</button>
+      <button class="filter-chip" data-filter="balanced">balanced</button>
+      <button class="filter-chip" data-filter="under">under-extracted</button>
+      <button class="filter-chip" data-filter="over">over-extracted</button>
     </div>
   </div>
 
-  <div id="shot-list" class="flex flex-col gap-4">
-    <p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Loading...</p>
-  </div>
+  <div id="shots-container" style="display:flex; flex-direction:column; gap:10px;"></div>
 
-  <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
 </main>
 
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
-  </a>
-  <a class="flex items-center justify-center text-on-primary bg-primary rounded-lg px-4 py-2 transition-transform active:scale-95" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">History</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 transition-all" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Inventory</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
-  </a>
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-tab">tracker</a>
+    <button class="nav-tab active">history</button>
+    <button class="nav-tab">inventory</button>
+    <button class="nav-tab">brew</button>
+  </div>
 </nav>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const SUPABASE_URL='https://pblsuaypnzvbdjbnqghv.supabase.co';
-  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
-  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let allShots=[];
-  let pendingDeleteId=null;
+let shots = [], activeFilter = 'all', searchQuery = '';
 
-  const BREWER_COLORS={
-    'Caro':'color:#F0BD8B;background:rgba(240,189,139,0.12);border:1px solid rgba(240,189,139,0.25)',
-    'Ross':'color:#F1DFD3;background:rgba(241,223,211,0.08);border:1px solid rgba(241,223,211,0.2)',
-  };
+function formatDate(d) {
+  const now = new Date(), diff = now - d;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  const opts = {weekday:'short', day:'numeric', month:'short'};
+  return d.toLocaleDateString('en-AU', opts);
+}
 
-  function ratingChipStyle(r){
-    const m={
-      'Balanced':'color:#F1DFD3;background:rgba(241,223,211,0.15)',
-      'Sour':'color:#F0BD8B;background:rgba(240,189,139,0.15)',
-      'Bitter':'color:#9c8d8a;background:#2a2a2a',
-      'Under-extracted':'color:#F0BD8B;background:rgba(240,189,139,0.15)',
-      'Over-extracted':'color:#9c8d8a;background:#2a2a2a',
-      'Unrated':'color:#9c8d8a;background:#2a2a2a',
-    };
-    return m[r]||m['Unrated'];
+function ratingClass(s) {
+  if (s === 'Balanced') return 'rating-balanced';
+  if (s === 'Under-extracted') return 'rating-under';
+  return 'rating-over';
+}
+function ratingLabel(s) {
+  if (s === 'Balanced') return 'balanced';
+  if (s === 'Under-extracted') return 'under-extracted';
+  if (s === 'Over-extracted') return 'over-extracted';
+  return s ? s.toLowerCase() : 'unrated';
+}
+
+async function loadShots() {
+  const { data, error } = await db.from('shots').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  shots = data || [];
+  renderShots();
+}
+
+function getFilteredShots() {
+  return shots.filter(s => {
+    const matchFilter = activeFilter === 'all' || s.summary_label === activeFilter;
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q ||
+      (s.bean_name || '').toLowerCase().includes(q) ||
+      (s.brewer || '').toLowerCase().includes(q) ||
+      (s.notes || '').toLowerCase().includes(q) ||
+      (s.rating || '').toLowerCase().includes(q) ||
+      (s.grind_speed || '').toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+}
+
+function renderShots() {
+  const container = document.getElementById('shots-container');
+  const filtered = getFilteredShots();
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">☕</div><p>no shots found</p></div>`;
+    return;
   }
-
-  function renderShots(shots){
-    const container=document.getElementById('shot-list');
-    if(!shots||shots.length===0){
-      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">No shots found</p>';
-      return;
-    }
-    container.innerHTML=shots.map(shot=>{
-      const dt=new Date(shot.created_at);
-      const date=dt.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
-      const time=dt.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:true});
-
-      // Tags row
-      const tags=[];
-      if(shot.brewer) tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest" style="${BREWER_COLORS[shot.brewer]||BREWER_COLORS['Ross']}">${shot.brewer}</span>`);
-      if(shot.grind_speed) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Speed: ${shot.grind_speed}</span>`);
-      if(shot.grind_setting) tags.push(`<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[9px] font-bold uppercase tracking-widest text-outline">Grind ${shot.grind_setting}</span>`);
-      if(shot.rating&&shot.rating!=='Unrated'){
-        shot.rating.split(',').forEach(r=>{
-          const rt=r.trim();
-          tags.push(`<span class="px-3 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-widest" style="${ratingChipStyle(rt)}">${rt}</span>`);
-        });
-      }
-
-      const doseYield=(shot.dose_in||shot.yield_out)?`
+  container.innerHTML = filtered.map(s => {
+    const label = s.summary_label || 'Unrated';
+    const rc = ratingClass(label);
+    return `<div class="shot-card" data-id="${s.id}">
+      <div class="shot-card-header">
         <div>
-          <span class="block text-[10px] uppercase font-bold tracking-widest text-outline/60 mb-1">Dose In / Out</span>
-          <div class="flex items-baseline gap-1">
-            <span class="text-2xl font-semibold tracking-tight text-on-surface">${shot.dose_in||'—'}<span class="text-xs text-primary/70 ml-0.5">g</span></span>
-            <span class="text-outline/30 font-thin px-1">/</span>
-            <span class="text-2xl font-semibold tracking-tight text-on-surface">${shot.yield_out||'—'}<span class="text-xs text-primary/70 ml-0.5">g</span></span>
-          </div>
-        </div>`:'' ;
-
-      return `<article class="bg-surface-container-low rounded-[1.25rem] p-6 border border-outline-variant/5 relative" id="card-${shot.id}">
-        <button onclick="confirmDelete('${shot.id}')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors opacity-40 hover:opacity-100">
-          <span class="material-symbols-outlined text-outline text-lg">delete</span>
-        </button>
-        <div class="mb-5">
-          <span class="block text-[10px] font-bold uppercase tracking-[0.2em] text-outline mb-1">${date} • ${time}</span>
-          <h3 class="text-xl font-extrabold tracking-tight text-on-surface leading-tight">${shot.bean_name||'Unknown Bean'}</h3>
+          <div class="shot-card-title">${s.bean_name || '—'}</div>
+          <div class="shot-card-sub">${s.brewer ? s.brewer + ' · ' : ''}${formatDate(new Date(s.created_at))}</div>
         </div>
-        <div class="flex gap-10 mb-5">
-          <div>
-            <span class="block text-[10px] uppercase font-bold tracking-widest text-outline/60 mb-1">Extraction</span>
-            <div class="flex items-baseline">
-              <span class="text-4xl font-light tracking-tighter text-on-surface">${shot.duration}</span>
-              <span class="text-lg text-primary ml-0.5 font-medium">s</span>
-            </div>
-          </div>
-          ${doseYield}
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          <span class="shot-rating-badge ${rc}">${ratingLabel(label)}</span>
+          <button class="delete-btn" onclick="deleteShot('${s.id}')" aria-label="Delete shot">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2 3.5h9M5 3.5V2.5h3v1M5.5 5.5v4M7.5 5.5v4M3 3.5l.5 7h6l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
-        ${tags.length>0?`<div class="flex flex-wrap gap-2 mb-5">${tags.join('')}</div>`:''}
-        ${shot.notes?`<div class="bg-surface-container-lowest/60 p-4 rounded-xl border border-outline-variant/5">
-          <p class="text-[13px] leading-relaxed text-on-surface-variant italic font-medium">"${shot.notes}"</p>
-        </div>`:''}
-      </article>`;
-    }).join('');
-  }
+      </div>
+      <div class="shot-stats-row">
+        <div class="stat-cell">
+          <div class="stat-val">${s.grind_setting ?? '—'}</div>
+          <div class="stat-key">grind</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">${s.duration ? s.duration + 's' : '—'}</div>
+          <div class="stat-key">time</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-val">${s.dose_in || '—'}g → ${s.yield_out || '—'}g</div>
+          <div class="stat-key">dose → yield</div>
+        </div>
+      </div>
+      ${s.notes ? `<div class="shot-notes">${s.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
 
-  async function loadShots(){
-    const{data,error}=await db.from('shots').select('*').order('created_at',{ascending:false});
-    if(error){console.error(error);document.getElementById('shot-list').innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Could not load shots</p>';return;}
-    allShots=data||[];
-    renderShots(allShots);
-  }
+async function deleteShot(id) {
+  const card = document.querySelector(`.shot-card[data-id="${id}"]`);
+  if (card) card.classList.add('deleting');
+  setTimeout(async () => {
+    const { error } = await db.from('shots').delete().eq('id', id);
+    if (error) { console.error(error); showToast('could not delete'); return; }
+    shots = shots.filter(s => s.id !== id);
+    renderShots();
+    showToast('shot deleted');
+  }, 260);
+}
 
-  function filterShots(){
-    const q=document.getElementById('search-input').value.toLowerCase().trim();
-    if(!q){renderShots(allShots);return;}
-    const filtered=allShots.filter(s=>{
-      return (s.bean_name||'').toLowerCase().includes(q)||
-             (s.brewer||'').toLowerCase().includes(q)||
-             (s.rating||'').toLowerCase().includes(q)||
-             (s.notes||'').toLowerCase().includes(q)||
-             (s.grind_speed||'').toLowerCase().includes(q);
-    });
-    renderShots(filtered);
-  }
+// Search
+document.getElementById('search').addEventListener('input', e => { searchQuery = e.target.value; renderShots(); });
 
-  function confirmDelete(id){
-    pendingDeleteId=id;
-    document.getElementById('confirm-modal').classList.remove('hidden');
-  }
-  function closeConfirmModal(){
-    document.getElementById('confirm-modal').classList.add('hidden');
-    pendingDeleteId=null;
-  }
-  async function executeDelete(){
-    document.getElementById('confirm-modal').classList.add('hidden');
-    if(!pendingDeleteId)return;
-    const{error}=await db.from('shots').delete().eq('id',pendingDeleteId);
-    if(error){console.error(error);showToast('Could not delete — try again');pendingDeleteId=null;return;}
-    showToast('Shot deleted');
-    pendingDeleteId=null;
-    loadShots();
-  }
+// Filter chips
+document.getElementById('filter-row').querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    activeFilter = chip.dataset.filter;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    renderShots();
+  });
+});
 
-  function showToast(msg){
-    const t=document.getElementById('toast');t.textContent=msg;
-    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
-    setTimeout(()=>t.classList.add('hidden'),2700);
-  }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
 
-  loadShots();
+loadShots();
 </script>
 </body>
 </html>
+
+<style id="__om-edit-overrides">
+</style>
