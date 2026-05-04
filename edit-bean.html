@@ -1,394 +1,360 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ritual — edit coffee</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ritual — add coffee</title>
+<link rel="stylesheet" href="ritual-shared.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode:"class",
-    theme:{
-      extend:{
-        colors:{
-          "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
-          "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
-          "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
-          "surface-container":"#201f1f","outline":"#9c8d8a","on-surface":"#e5e2e1",
-          "secondary-container":"#5b403c","on-background":"#e5e2e1","inverse-surface":"#e5e2e1",
-          "on-secondary-container":"#d1ada7","inverse-on-surface":"#313030","on-primary-container":"#3e2c26",
-          "on-surface-variant":"#d4c3bf","surface-container-lowest":"#0e0e0e",
-          "surface-container-highest":"#353534","surface-container-low":"#1c1b1b",
-          "tertiary":"#cfc4c0","error":"#ffb4ab","surface-bright":"#393939","on-tertiary":"#352f2d"
-        },
-        fontFamily:{"headline":["Manrope"],"body":["Manrope"],"label":["Manrope"]},
-        borderRadius:{"DEFAULT":"0.5rem","lg":"0.75rem","xl":"1.5rem","full":"9999px"},
-      },
-    },
-  }
-</script>
 <style>
-  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-  body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
+.roast-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.roast-markers {
+  display: flex;
+  justify-content: space-between;
+}
+.roast-marker {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-mid);
+}
+.roast-current {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: -4px;
+}
 
-  /* ── Consistent field styling matching grind tracker page ── */
-  .field-input,
-  input.field-input,
-  select.field-input,
-  textarea.field-input {
-    width:100% !important;
-    background-color:#1c1b1b !important;
-    background:#1c1b1b !important;
-    border:1px solid rgba(80,68,66,0.2) !important;
-    border-radius:0.75rem !important;
-    padding:0.75rem 1rem !important;
-    color:#e5e2e1 !important;
-    font-family:'Manrope',sans-serif !important;
-    font-size:0.875rem !important;
-    font-weight:500 !important;
-    outline:none !important;
-    box-shadow:none;
-    transition:box-shadow 0.2s;
-    -webkit-appearance:none !important;
-    appearance:none !important;
-  }
-  .field-input:focus,
-  input.field-input:focus,
-  select.field-input:focus,
-  textarea.field-input:focus {
-    box-shadow:0 0 0 1px rgba(241,223,211,0.3) !important;
-    background-color:#1c1b1b !important;
-    background:#1c1b1b !important;
-  }
-  /* Autofill override — Safari fills with yellow/white */
-  input.field-input:-webkit-autofill,
-  input.field-input:-webkit-autofill:hover,
-  input.field-input:-webkit-autofill:focus {
-    -webkit-box-shadow:0 0 0 1000px #1c1b1b inset !important;
-    -webkit-text-fill-color:#e5e2e1 !important;
-    border-radius:0.75rem !important;
-  }
-  .field-input::placeholder{color:rgba(156,141,138,0.35) !important;font-weight:400;}
-  select.field-input{cursor:pointer;}
-  .field-input[type=number]::-webkit-inner-spin-button,
-  .field-input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a89888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  padding-right: 36px !important;
+  cursor: pointer;
+}
 
-  .field-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#F1DFD3;margin-bottom:0.5rem;margin-left:0.25rem;}
+select option {
+  background: #1d1b18;
+  color: #e8e3de;
+}
 
-  /* Range slider */
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:#353534;border-radius:9999px;outline:none;cursor:pointer;}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:#F1DFD3;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.4);}
-  input[type=range]::-moz-range-thumb{width:18px;height:18px;background:#F1DFD3;border-radius:50%;border:none;cursor:pointer;}
+.descriptor-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
 
-  .descriptor-btn{transition:all 0.15s ease;}
+.custom-tag-input-wrap {
+  display: flex;
+  gap: 8px;
+}
+.custom-tag-input-wrap input {
+  flex: 1;
+}
+.btn-add-tag {
+  padding: 11px 16px;
+  background: var(--surface-high);
+  border: 1px solid rgba(80,68,66,0.25);
+  border-radius: var(--radius-input);
+  color: var(--primary);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-add-tag:hover { background: var(--surface-highest); }
 
-  @keyframes slide-up-fade{0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);}}
-  .toast-anim{animation:slide-up-fade 2.6s ease forwards;}
+/* date input fix */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.progress-dots {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  padding: 8px 0;
+}
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--surface-high);
+  transition: background 0.2s;
+}
+.dot.active { background: var(--primary); }
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 </style>
 </head>
-<body class="bg-surface text-on-surface min-h-screen pb-24">
+<body>
 
-<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
-  <div class="flex items-center justify-between w-full">
-    <a href="index.html" class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">arrow_back</span></a>
-    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
-    <button class="p-2 hover:bg-white/5 rounded-full transition-colors"><span class="material-symbols-outlined text-primary text-2xl">settings</span></button>
+<header class="header">
+  <div class="header-inner">
+    <a href="select-coffee.html" class="header-icon" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <span class="wordmark">add coffee</span>
+    <div class="header-icon" style="opacity:0;pointer-events:none;"></div>
   </div>
 </header>
 
-<main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
-  <div class="mb-8">
-    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">add new coffee</h2>
-  </div>
+<main class="page" style="gap:14px;">
 
-  <div class="space-y-8">
+  <!-- Basics -->
+  <div class="card form-section">
+    <span class="section-label" style="margin-bottom:2px;">coffee details</span>
 
     <div>
-      <label class="field-label">Name of Coffee</label>
-      <input id="bean-name" class="field-input" type="text" placeholder="e.g. Ethiopia Yirgacheffe"/>
-    </div>
-
-    <div class="grid grid-cols-5 gap-4">
-      <div class="col-span-3">
-        <label class="field-label">Roaster</label>
-        <input id="roaster" class="field-input" type="text" placeholder="e.g. Onyx Coffee Lab"/>
-      </div>
-      <div class="col-span-2">
-        <label class="field-label">Region</label>
-        <div class="relative">
-          <select id="region" class="field-input pr-8">
-            <option value="">Select...</option>
-            <option>Unknown</option>
-            <optgroup label="Africa">
-              <option>Ethiopia</option>
-              <option>Kenya</option>
-              <option>Rwanda</option>
-              <option>Burundi</option>
-              <option>Tanzania</option>
-              <option>Uganda</option>
-              <option>Zimbabwe</option>
-            </optgroup>
-            <optgroup label="Central & South America">
-              <option>Colombia</option>
-              <option>Guatemala</option>
-              <option>Brazil</option>
-              <option>Costa Rica</option>
-              <option>Panama</option>
-              <option>Honduras</option>
-              <option>Peru</option>
-              <option>Bolivia</option>
-              <option>Ecuador</option>
-            </optgroup>
-            <optgroup label="Asia Pacific">
-              <option>Indonesia</option>
-              <option>Papua New Guinea</option>
-              <option>Yemen</option>
-              <option>India</option>
-              <option>Vietnam</option>
-              <option>Myanmar</option>
-            </optgroup>
-            <option value="custom">Other (type below)</option>
-          </select>
-          <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-primary/50 text-base">expand_more</span>
-        </div>
-      </div>
-    </div>
-
-    <div id="region-custom-wrap" class="hidden">
-      <label class="field-label">Region (custom)</label>
-      <input id="region-custom" class="field-input" type="text" placeholder="Type region..."/>
+      <label class="field-label">name of coffee <span style="color:var(--primary); opacity:0.7;">*</span></label>
+      <input type="text" id="f-name" placeholder="e.g. Ethiopia Yirgacheffe">
     </div>
 
     <div>
-      <label class="field-label">Process</label>
-      <div class="relative">
-        <select id="process" class="field-input pr-10">
-          <option value="">Select process...</option>
-          <option>Washed</option>
-          <option>Natural</option>
-          <option>Honey</option>
-          <option>Anaerobic Natural</option>
-          <option>Anaerobic Washed</option>
-          <option>Carbonic Maceration</option>
-          <option>Wet-Hulled</option>
-          <option>Pulped Natural</option>
-          <option>Double Fermentation</option>
-          <option>Experimental</option>
-          <option>Other</option>
+      <label class="field-label">roaster <span style="color:var(--primary); opacity:0.7;">*</span></label>
+      <input type="text" id="f-roaster" placeholder="e.g. Ona Coffee">
+    </div>
+
+    <div class="field-row cols-2">
+      <div>
+        <label class="field-label">region / origin</label>
+        <select id="f-origin">
+          <option value="">select…</option>
+          <option value="Ethiopia">Ethiopia</option>
+          <option value="Colombia">Colombia</option>
+          <option value="Guatemala">Guatemala</option>
+          <option value="Brazil">Brazil</option>
+          <option value="Kenya">Kenya</option>
+          <option value="Yemen">Yemen</option>
+          <option value="Indonesia">Indonesia</option>
+          <option value="Panama">Panama</option>
+          <option value="Peru">Peru</option>
+          <option value="Costa Rica">Costa Rica</option>
+          <option value="Other">Other</option>
         </select>
-        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary/50 text-base">expand_more</span>
+      </div>
+      <div>
+        <label class="field-label">process</label>
+        <select id="f-process">
+          <option value="">select…</option>
+          <option value="Washed">Washed</option>
+          <option value="Natural">Natural</option>
+          <option value="Honey">Honey</option>
+          <option value="Anaerobic">Anaerobic</option>
+          <option value="Wet-Hulled">Wet-Hulled</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
     </div>
-
-    <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
-      <div class="flex justify-between items-end mb-5">
-        <label class="field-label mb-0">Roast Level</label>
-        <span id="roast-label" class="text-primary font-extrabold text-sm tracking-tight">Medium-Light</span>
-      </div>
-      <input id="roast-slider" type="range" min="1" max="5" step="1" value="2" oninput="updateRoastLabel(this.value)"/>
-      <div class="flex justify-between mt-3 px-0.5">
-        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Light</span>
-        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Medium</span>
-        <span class="text-[10px] text-outline font-bold uppercase tracking-wider">Dark</span>
-      </div>
-    </div>
-
-    <div>
-      <label class="field-label">Bag Weight (g)</label>
-      <input id="bag-weight" class="field-input" type="number" placeholder="250"/>
-    </div>
-
-    <div>
-      <label class="field-label">Roast Date <span class="text-error normal-case tracking-normal font-bold">*</span></label>
-      <input id="roast-date" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
-    </div>
-
-    <div>
-      <label class="field-label">Date Opened <span class="text-outline normal-case tracking-normal font-normal">(optional)</span></label>
-      <input id="date-opened" class="field-input" type="text" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric"/>
-    </div>
-
-    <div class="space-y-3">
-      <label class="field-label">Expected Tasting Notes</label>
-      <p class="text-[10px] text-outline font-medium -mt-1 ml-1">Select all that apply — or add your own</p>
-      <div class="flex flex-wrap gap-2" id="descriptor-tags">
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Floral</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Fruity</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Citrus</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Berry</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Chocolate</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Caramel</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Nutty</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Spice</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Earthy</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Smoky</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Sweet</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Bright</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Syrupy</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Winey</button>
-        <button type="button" onclick="toggleDescriptor(this)" class="descriptor-btn px-4 py-2 bg-surface-container-high rounded-full text-[10px] uppercase tracking-widest font-extrabold text-primary">Jasmine</button>
-      </div>
-      <div class="flex gap-2 mt-2">
-        <input id="custom-descriptor" class="field-input flex-1 py-2.5 text-sm" type="text" placeholder="Add your own..."/>
-        <button type="button" onclick="addCustomDescriptor()" class="px-4 py-2.5 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary hover:bg-primary hover:text-on-primary transition-all">Add</button>
-      </div>
-    </div>
-
-    <!-- Phase selector -->
-    <div class="space-y-3">
-      <label class="field-label">Status</label>
-      <div class="flex gap-2">
-        <button type="button" onclick="selectPhase(this,'resting')" data-phase="resting"
-          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
-          Resting
-        </button>
-        <button type="button" onclick="selectPhase(this,'ready')" data-phase="ready"
-          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
-          Ready
-        </button>
-        <button type="button" onclick="selectPhase(this,'freezer')" data-phase="freezer"
-          class="phase-btn flex-1 py-3 bg-surface-container-high rounded-xl text-[10px] uppercase tracking-widest font-extrabold text-primary transition-all active:scale-95">
-          Freezer
-        </button>
-      </div>
-    </div>
-
-    <div class="pt-2 flex flex-col gap-3">
-      <button onclick="saveBean()" class="w-full py-4 bg-primary text-on-primary font-extrabold rounded-xl uppercase tracking-widest text-xs shadow-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
-        Save Changes
-      </button>
-      <a href="index.html" class="w-full py-4 bg-surface-container-high text-on-surface font-extrabold rounded-xl uppercase tracking-widest text-xs hover:bg-surface-container-highest transition-colors active:scale-[0.98] text-center block">
-        Discard
-      </a>
-    </div>
-
   </div>
+
+  <!-- Roast level -->
+  <div class="card form-section">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:2px;">
+      <span class="section-label">roast level</span>
+      <span id="roast-level-label" style="font-size:9px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary);">
+</span>
+    </div>
+    <div class="tag-group" id="roast-step-tags">
+      <button class="tag tag-default" data-val="2" data-label="light">light</button>
+      <button class="tag tag-default selected" data-val="5" data-label="medium">medium</button>
+      <button class="tag tag-default" data-val="9" data-label="dark">dark</button>
+    </div>
+    <input type="hidden" id="f-roast" value="5">
+  </div>
+
+  <!-- Bag & Dates -->
+  <div class="card form-section">
+    <span class="section-label" style="margin-bottom:2px;">bag info</span>
+
+    <div class="field-row cols-2">
+      <div>
+        <label class="field-label">bag weight (g)</label>
+        <input type="number" id="f-weight" placeholder="250">
+      </div>
+      <div>
+        <label class="field-label">roast date</label>
+        <input type="date" id="f-roast-date">
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">date opened <span style="opacity:0.4;">(optional)</span></label>
+      <input type="date" id="f-opened">
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="card form-section">
+    <span class="section-label" style="margin-bottom:2px;">status</span>
+    <div class="tag-group" id="status-tags">
+      <button class="tag tag-default" data-val="resting">resting</button>
+      <button class="tag tag-default selected" data-val="ready">ready</button>
+      <button class="tag tag-default" data-val="freezer">freezer</button>
+    </div>
+    <div style="font-size: 11px; color: var(--on-surface-mid); font-weight: 500; line-height: 1.5" id="status-hint">
+      This coffee is ready to pull shots with.
+    </div>
+  </div>
+
+  <!-- Expected Descriptors -->
+  <div class="card form-section">
+    <span class="section-label" style="margin-bottom:2px;">expected flavour notes</span>
+    <div class="descriptor-tags tag-group" id="descriptor-tags">
+      <button class="tag tag-positive" data-val="floral">floral</button>
+      <button class="tag tag-positive" data-val="citrus">citrus</button>
+      <button class="tag tag-positive" data-val="berry">berry</button>
+      <button class="tag tag-positive" data-val="stone fruit">stone fruit</button>
+      <button class="tag tag-positive" data-val="caramel">caramel</button>
+      <button class="tag tag-positive" data-val="chocolate">chocolate</button>
+      <button class="tag tag-positive" data-val="nutty">nutty</button>
+      <button class="tag tag-positive" data-val="earthy">earthy</button>
+      <button class="tag tag-positive" data-val="spice">spice</button>
+      <button class="tag tag-positive" data-val="honey">honey</button>
+    </div>
+    <div class="custom-tag-input-wrap" style="margin-top:4px;">
+      <input type="text" id="custom-tag-input" placeholder="add custom note…">
+      <button class="btn-add-tag" id="add-custom-tag">add</button>
+    </div>
+  </div>
+
+<!-- Save -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <button class="btn-primary" id="save-bean-btn">add coffee</button>
+    <a href="select-coffee.html" class="btn-secondary" style="display:block; text-align:center; text-decoration:none;">cancel</a>
+  </div>
+
 </main>
 
-<div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
-
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">History</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Inventory</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
-  </a>
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-tab">tracker</a>
+    <a href="shot-history.html" class="nav-tab">history</a>
+    <button class="nav-tab">inventory</button>
+    <button class="nav-tab">brew</button>
+  </div>
 </nav>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const SUPABASE_URL='https://pblsuaypnzvbdjbnqghv.supabase.co';
-  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
-  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  const ROAST_LABELS=['Light','Medium-Light','Medium','Medium-Dark','Dark'];
+// Roast level steps
+const roastStepTags = document.getElementById('roast-step-tags');
+const roastLabelEl = document.getElementById('roast-level-label');
+const roastInput = document.getElementById('f-roast');
 
-  function updateRoastLabel(v){document.getElementById('roast-label').textContent=ROAST_LABELS[parseInt(v)-1];}
-
-  function setupDateInput(id){
-    document.getElementById(id).addEventListener('input',function(){
-      let v=this.value.replace(/\D/g,'');
-      if(v.length>2)v=v.substring(0,2)+'/'+v.substring(2);
-      if(v.length>5)v=v.substring(0,5)+'/'+v.substring(5);
-      if(v.length>10)v=v.substring(0,10);
-      this.value=v;
-    });
-  }
-  setupDateInput('roast-date');
-  setupDateInput('date-opened');
-
-  document.getElementById('region').addEventListener('change',function(){
-    document.getElementById('region-custom-wrap').classList.toggle('hidden',this.value!=='custom');
+roastStepTags.querySelectorAll('.tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    roastStepTags.querySelectorAll('.tag').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    roastInput.value = btn.dataset.val;
+    roastLabelEl.textContent = btn.dataset.label;
   });
+});
 
-  function toggleDescriptor(btn){
-    const active=btn.getAttribute('data-active')==='1';
-    if(active){btn.style.backgroundColor='';btn.style.color='#F1DFD3';btn.removeAttribute('data-active');}
-    else{btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';btn.setAttribute('data-active','1');}
-  }
-
-  function addCustomDescriptor(){
-    const input=document.getElementById('custom-descriptor');
-    const val=input.value.trim();if(!val)return;
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.className='descriptor-btn px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-extrabold';
-    btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
-    btn.setAttribute('data-active','1');btn.setAttribute('data-custom','1');
-    btn.textContent=val;btn.onclick=function(){toggleDescriptor(this);};
-    document.getElementById('descriptor-tags').appendChild(btn);
-    input.value='';
-  }
-
-  document.getElementById('custom-descriptor').addEventListener('keydown',function(e){
-    if(e.key==='Enter'){e.preventDefault();addCustomDescriptor();}
+// Status tags
+const statusHints = {
+  resting: 'Still degassing — wait a few days before pulling shots.',
+  ready: 'This coffee is ready to pull shots with.',
+  freezer: 'Stored in the freezer — thaw before use.'
+};
+const statusTags = document.getElementById('status-tags');
+statusTags.querySelectorAll('.tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    statusTags.querySelectorAll('.tag').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('status-hint').textContent = statusHints[btn.dataset.val];
   });
+});
 
-  function getSelectedDescriptors(){
-    const out=[];
-    document.querySelectorAll('#descriptor-tags [data-active="1"]').forEach(b=>out.push(b.textContent.trim()));
-    return out;
-  }
+// Descriptor tags (multi-select)
+document.getElementById('descriptor-tags').querySelectorAll('.tag').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('selected'));
+});
 
-  // Phase selection
-  let selectedPhase = null;
-  function selectPhase(btn, phase){
-    document.querySelectorAll('.phase-btn').forEach(b=>{
-      b.style.backgroundColor='';b.style.color='#F1DFD3';
-    });
-    btn.style.backgroundColor='#F1DFD3';btn.style.color='#3e2c26';
-    selectedPhase=phase;
-  }
+// Custom tags
+document.getElementById('add-custom-tag').addEventListener('click', addCustomTag);
+document.getElementById('custom-tag-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addCustomTag(); }
+});
 
-  async function saveBean(){
-    const name=document.getElementById('bean-name').value.trim();
-    if(!name){showToast('Please enter a coffee name');return;}
+function addCustomTag() {
+  const input = document.getElementById('custom-tag-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const container = document.getElementById('descriptor-tags');
+  const btn = document.createElement('button');
+  btn.className = 'tag tag-positive selected';
+  btn.dataset.val = val;
+  btn.textContent = val;
+  btn.addEventListener('click', () => btn.classList.toggle('selected'));
+  container.appendChild(btn);
+  input.value = '';
+}
 
-    const roastDate=document.getElementById('roast-date').value.trim();
-    if(!roastDate){showToast('Roast date is required');return;}
+// Date default
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('f-roast-date').value = today;
 
-    const roastIdx=parseInt(document.getElementById('roast-slider').value);
-    let region=document.getElementById('region').value;
-    if(region==='custom')region=document.getElementById('region-custom').value.trim()||null;
-    if(region==='')region=null;
+// Save
+const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const bean={
-      name,
-      roaster:document.getElementById('roaster').value.trim()||null,
-      origin:region,
-      process:document.getElementById('process').value||null,
-      roast_level:ROAST_LABELS[roastIdx-1],
-      bag_weight:parseFloat(document.getElementById('bag-weight').value)||null,
-      roast_date:roastDate,
-      date_opened:document.getElementById('date-opened').value.trim()||null,
-      descriptors:getSelectedDescriptors(),
-      phase:selectedPhase||null,
-    };
+document.getElementById('save-bean-btn').addEventListener('click', async () => {
+  const name = document.getElementById('f-name').value.trim();
+  const roaster = document.getElementById('f-roaster').value.trim();
+  const roastDate = document.getElementById('f-roast-date').value;
+  if (!name) { showToast('add a coffee name first'); return; }
+  if (!roaster) { showToast('add a roaster name'); return; }
+  if (!roastDate) { showToast('roast date is required'); return; }
 
-    const{error}=await db.from('beans').insert([bean]);
-    if(error){
-      console.error('Supabase error:', error.message, error.details, error.hint);
-      showToast('Error: '+error.message);
-      return;
-    }
-    showToast('Coffee added ✓');
-    setTimeout(()=>window.location.href='index.html',800);
-  }
+  const descriptors = [...document.querySelectorAll('#descriptor-tags .tag.selected')].map(b => b.dataset.val);
+  const phase = document.querySelector('#status-tags .tag.selected')?.dataset.val || 'ready';
+  const roastLevel = document.querySelector('#roast-step-tags .tag.selected')?.dataset.label || 'medium';
 
-  function showToast(msg){
-    const t=document.getElementById('toast');t.textContent=msg;
-    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
-    setTimeout(()=>t.classList.add('hidden'),2700);
-  }
+  const bean = {
+    name,
+    roaster,
+    origin: document.getElementById('f-origin').value || null,
+    process: document.getElementById('f-process').value || null,
+    roast_level: roastLevel.charAt(0).toUpperCase() + roastLevel.slice(1),
+    bag_weight: document.getElementById('f-weight').value ? parseFloat(document.getElementById('f-weight').value) : null,
+    roast_date: roastDate,
+    date_opened: document.getElementById('f-opened').value || null,
+    descriptors,
+    phase,
+  };
 
+  const { error } = await db.from('beans').insert([bean]);
+  if (error) { console.error('Save error:', error.message); showToast('error: ' + error.message); return; }
+  showToast(`${name} added ✓`);
+  setTimeout(() => window.location.href = 'select-coffee.html', 900);
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
 </script>
 </body>
 </html>
