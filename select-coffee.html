@@ -1,173 +1,284 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ritual — currently brewing</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ritual — select coffee</title>
+<link rel="stylesheet" href="ritual-shared.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode:"class",
-    theme:{
-      extend:{
-        colors:{
-          "surface-container-high":"#2a2a2a","surface":"#131313","primary-container":"#49362f",
-          "on-secondary":"#422a26","primary":"#F1DFD3","on-primary":"#3e2c26","secondary":"#F0BD8B",
-          "outline-variant":"#504442","surface-variant":"#353534","background":"#131313",
-          "surface-container":"#201f1f","outline":"#9c8d8a","on-surface":"#e5e2e1",
-          "secondary-container":"#5b403c","on-background":"#e5e2e1","inverse-surface":"#e5e2e1",
-          "on-secondary-container":"#d1ada7","inverse-on-surface":"#313030","on-primary-container":"#3e2c26",
-          "on-surface-variant":"#d4c3bf","surface-container-lowest":"#0e0e0e",
-          "surface-container-highest":"#353534","surface-container-low":"#1c1b1b",
-          "tertiary":"#cfc4c0","error":"#ffb4ab","surface-bright":"#393939","on-tertiary":"#352f2d"
-        },
-        fontFamily:{"headline":["Manrope"],"body":["Manrope"],"label":["Manrope"]},
-        borderRadius:{"DEFAULT":"0.5rem","lg":"0.75rem","xl":"1.5rem","full":"9999px"},
-      },
-    },
-  }
-</script>
 <style>
-  .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}
-  body{background-color:#131313;color:#E5E2E1;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased;}
-  @keyframes slide-up-fade{0%{opacity:0;transform:translateY(8px);}15%{opacity:1;transform:translateY(0);}80%{opacity:1;}100%{opacity:0;transform:translateY(-4px);}}
-  .toast-anim{animation:slide-up-fade 2.6s ease forwards;}
-  .coffee-card{transition:all 0.15s ease;}
-  .coffee-card:active{transform:scale(0.98);}
+.bean-card {
+  background: var(--surface-low);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 18px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bean-card:hover { background: var(--surface-mid); }
+.bean-card:active { transform: scale(0.99); }
+.bean-card.current {
+  border-color: rgba(241,223,211,0.2);
+  background: rgba(241,223,211,0.04);
+}
+
+.bean-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-high);
+  border: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--on-surface-mid);
+  text-transform: uppercase;
+}
+
+.bean-card.current .bean-dot {
+  background: rgba(241,223,211,0.1);
+  color: var(--primary);
+  border-color: rgba(241,223,211,0.15);
+}
+
+.bean-info { flex: 1; min-width: 0; }
+
+.bean-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bean-roaster {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-mid);
+  margin-top: 2px;
+}
+
+.bean-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.bean-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--surface-high);
+  color: var(--on-surface-mid);
+}
+
+.bean-card.current .bean-pill {
+  background: rgba(241,223,211,0.08);
+  color: var(--primary);
+}
+
+.roast-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.roast-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--surface-high);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.roast-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  opacity: 0.5;
+}
+.bean-card.current .roast-fill { opacity: 1; }
+.roast-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-mid);
+  white-space: nowrap;
+}
+
+/* Status pill */
+.status-resting { background: rgba(80,68,66,0.4); color: #9c8d8a; }
+.status-ready   { background: rgba(200,134,74,0.15); color: #C8864A; }
+.status-freezer { background: rgba(100,120,160,0.15); color: #8090b0; }
+
+/* Phase badge */
+.phase-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Shots left badge */
+.shots-left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.shots-left-num {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--on-surface);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.shots-left-label {
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--on-surface-low);
+}
+.bean-card.current .shots-left-num { color: var(--primary); }
 </style>
 </head>
-<body class="bg-surface text-on-surface min-h-screen pb-24">
+<body>
 
-<header class="fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 bg-[#131313]/90 backdrop-blur-md">
-  <div class="flex items-center justify-between w-full">
-    <a href="index.html" class="p-2 hover:bg-white/5 rounded-full transition-colors">
-      <span class="material-symbols-outlined text-primary text-2xl">arrow_back</span>
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="header-icon" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </a>
-    <h1 class="text-2xl font-extrabold tracking-tighter text-primary leading-none absolute left-1/2 -translate-x-1/2">ritual</h1>
-    <button class="p-2 hover:bg-white/5 rounded-full transition-colors">
-      <span class="material-symbols-outlined text-primary text-2xl">settings</span>
-    </button>
+    <span class="wordmark">select coffee</span>
+    <div class="header-icon" style="opacity:0;pointer-events:none;"></div>
   </div>
 </header>
 
-<main class="px-6 max-w-2xl mx-auto pt-24 pb-10">
-  <div class="mb-8">
-    <h2 class="text-3xl font-extrabold tracking-tighter text-primary lowercase">currently brewing</h2>
+<main class="page" style="gap:10px;">
+
+  <div style="padding: 4px 0 8px;">
+    <div style="font-size:9px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; color:var(--on-surface-mid);">tap to brew ·&nbsp;</div>
   </div>
 
-  <div id="coffee-list" class="flex flex-col gap-3">
-    <p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Loading...</p>
+  <div id="beans-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+  <div style="margin-top:8px;">
+    <a href="edit-bean.html" class="btn-secondary" style="display:block; text-align:center; text-decoration:none;">+ add new coffee</a>
   </div>
 
-  <!-- Always visible add button -->
-  <div class="pt-4">
-    <a href="edit-bean.html" class="w-full border border-primary/30 text-primary py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-primary/10 text-xs font-extrabold uppercase tracking-widest">
-      <span class="material-symbols-outlined text-sm">add_circle</span>
-      Add New Coffee
-    </a>
-  </div>
 </main>
 
-<div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 hidden px-5 py-2.5 bg-surface-container-high rounded-full text-[11px] font-extrabold uppercase tracking-widest text-primary text-center whitespace-nowrap z-50"></div>
-
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pb-5 pt-3 bg-[#131313]/95 backdrop-blur-2xl border-t border-outline-variant/10">
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="index.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Tracker</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="shot-history.html">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">History</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 transition-all" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Inventory</span>
-  </a>
-  <a class="flex items-center justify-center text-on-surface opacity-40 px-4 py-2 hover:opacity-100 transition-all active:scale-95" href="#">
-    <span class="text-[10px] uppercase tracking-widest font-extrabold">Brew</span>
-  </a>
+<nav class="bottom-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-tab">tracker</a>
+    <a href="shot-history.html" class="nav-tab">history</a>
+    <button class="nav-tab">inventory</button>
+    <button class="nav-tab">brew</button>
+  </div>
 </nav>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const SUPABASE_URL='https://pblsuaypnzvbdjbnqghv.supabase.co';
-  const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
-  const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const SUPABASE_URL = 'https://pblsuaypnzvbdjbnqghv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibHN1YXlwbnp2YmRqYm5xZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MDg4NTIsImV4cCI6MjA5MDE4NDg1Mn0.qrHP35jRU5uMmGiHgfxqRjmo7Mg_5aA430Te2rDDGbM';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  async function loadCoffees(){
-    const container=document.getElementById('coffee-list');
-    const{data:beans,error}=await db.from('beans').select('*').order('created_at',{ascending:false});
+let currentBeanId = null;
 
-    if(error){
-      console.error(error);
-      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">Could not load coffees</p>';
-      return;
-    }
+function roastLevelLabel(l) {
+  if (!l) return '';
+  return l.toLowerCase();
+}
+function statusClass(s) { return `status-${s || 'ready'}`; }
 
-    if(!beans||beans.length===0){
-      container.innerHTML='<p class="text-outline text-xs text-center py-8 uppercase tracking-widest font-bold">No coffees yet — add one below</p>';
-      return;
-    }
+const STATUS_ICONS = {
+  ready: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="9" rx="6.5" ry="4.5" stroke="currentColor" stroke-width="1.4" transform="rotate(-35 9 9)"/><path d="M9 2.5C9 2.5 9 9 9 15.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" transform="rotate(-35 9 9)"/></svg>`,
+  resting: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5V9l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  freezer: `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4.5 4.5l9 9M13.5 4.5l-9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="1.3"/></svg>`
+};
 
-    // Get current bean id so we can show which is active
-    const{data:currentBean}=await db.from('current_bean').select('bean_id').eq('id',1).single();
-    const currentId=currentBean?.bean_id||null;
-
-    container.innerHTML=beans.map(bean=>{
-      const isActive=bean.id===currentId;
-      const detail=[];
-      if(bean.roast_level)detail.push(bean.roast_level);
-      if(bean.process)detail.push(bean.process);
-      if(bean.origin)detail.push(bean.origin);
-
-      // Shots left calc
-      const shotsLeft=bean.bag_weight?Math.floor(bean.bag_weight/20):null;
-
-      return `
-        <div class="coffee-card cursor-pointer bg-surface-container-low rounded-xl p-5 border ${isActive?'border-primary/40 bg-surface-container':'border-outline-variant/5'} hover:bg-surface-container transition-colors"
-          onclick="selectCoffee('${bean.id}','${escapeStr(bean.name)}','${escapeStr(bean.process||'')}','${escapeStr(bean.roast_level||'')}',${bean.bag_weight||null})">
-          <div class="flex items-center justify-between">
-            <div class="space-y-1 flex-1 min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-base font-extrabold text-on-surface tracking-tight">${bean.name}</span>
-                ${isActive?'<span class="px-2 py-0.5 bg-primary/15 text-primary text-[8px] font-extrabold rounded uppercase tracking-widest">Current</span>':''}
-              </div>
-              ${detail.length>0?`<p class="text-[11px] text-outline font-medium">${detail.join(' • ')}</p>`:''}
-              ${shotsLeft!==null?`<p class="text-[10px] text-outline/60 font-bold uppercase tracking-wider">${shotsLeft} shots approx</p>`:''}
-            </div>
-            <span class="material-symbols-outlined text-outline/30 ml-3 text-xl">chevron_right</span>
-          </div>
-        </div>`;
-    }).join('');
+async function loadBeans() {
+  const container = document.getElementById('beans-list');
+  const [{ data: beans, error }, { data: currentBean }] = await Promise.all([
+    db.from('beans').select('*').order('created_at', { ascending: false }),
+    db.from('current_bean').select('bean_id').eq('id', 1).single()
+  ]);
+  if (error) { container.innerHTML = '<p style="text-align:center;padding:40px 0;color:var(--on-surface-mid);">could not load coffees</p>'; return; }
+  currentBeanId = currentBean?.bean_id || null;
+  if (!beans || !beans.length) {
+    container.innerHTML = '<p style="text-align:center;padding:40px 0;color:var(--on-surface-mid);">no coffees yet — add one below</p>';
+    return;
   }
+  const { count: shotCount } = await db.from('shots').select('*', { count: 'exact', head: true });
+  container.innerHTML = beans.map(b => {
+    const isCurrent = b.id === currentBeanId;
+    const phase = b.phase || 'ready';
+    const shotsLeft = b.bag_weight ? Math.max(0, Math.floor(parseFloat(b.bag_weight) / 20) - (shotCount || 0)) : null;
+    const pills = [b.origin, b.process, b.roast_level ? roastLevelLabel(b.roast_level) : null].filter(Boolean);
+    return `<div class="bean-card ${isCurrent ? 'current' : ''}" onclick="selectBean('${b.id}','${esc(b.name)}','${esc(b.process||'')}','${esc(b.roast_level||'')}',${b.bag_weight||null},'${esc(b.roaster||'')}')">
+      <div class="bean-dot">${STATUS_ICONS[phase] || STATUS_ICONS.ready}</div>
+      <div class="bean-info">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div class="bean-name">${b.name}</div>
+          ${isCurrent ? '<span class="badge badge-current">current</span>' : ''}
+        </div>
+        <div class="bean-roaster">${b.roaster || ''}</div>
+        <div class="bean-meta">
+          ${pills.map(p => `<span class="bean-pill">${p}</span>`).join('')}
+          <span class="bean-pill phase-badge ${statusClass(phase)}">${phase}</span>
+        </div>
+      </div>
+      ${shotsLeft !== null ? `<div class="shots-left"><div class="shots-left-num">${shotsLeft}</div><div class="shots-left-label">shots</div></div>` : ''}
+    </div>`;
+  }).join('');
+}
 
-  function escapeStr(s){
-    return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  }
+function esc(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-  async function selectCoffee(beanId, name, process, roastLevel, bagWeight){
-    // Update current_bean row with the selected bean's details + reference id
-    const update={
-      id:1,
-      name,
-      process:process||null,
-      roast_level:roastLevel||null,
-      bag_weight:bagWeight||null,
-      bean_id:beanId,
-      updated_at:new Date().toISOString()
-    };
-    const{error}=await db.from('current_bean').upsert(update);
-    if(error){console.error(error);showToast('Could not update — try again');return;}
-    // Go straight back to tracker
-    window.location.href='index.html';
-  }
+async function selectBean(beanId, name, process, roastLevel, bagWeight, roaster) {
+  if (beanId === currentBeanId) { window.location.href = 'index.html'; return; }
+  const { error } = await db.from('current_bean').upsert({
+    id: 1, name, process: process || null, roast_level: roastLevel || null,
+    bag_weight: bagWeight || null, bean_id: beanId, roaster: roaster || null,
+    updated_at: new Date().toISOString()
+  });
+  if (error) { console.error(error); showToast('could not update — try again'); return; }
+  showToast('now brewing ' + name);
+  setTimeout(() => window.location.href = 'index.html', 700);
+}
 
-  function showToast(msg){
-    const t=document.getElementById('toast');t.textContent=msg;
-    t.classList.remove('hidden','toast-anim');void t.offsetWidth;t.classList.add('toast-anim');
-    setTimeout(()=>t.classList.add('hidden'),2700);
-  }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
 
-  loadCoffees();
+loadBeans();
 </script>
 </body>
 </html>
